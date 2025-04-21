@@ -16,7 +16,6 @@ services:
       MYSQL_DATABASE: desafio_anlix
     networks:
       - backnet
-      - frontnet
     ports:
     - '3306:3306'
     # restart: always
@@ -34,6 +33,8 @@ services:
       target: builder
     ports:
       - "4200:4200"
+    expose:
+      - 4200
     depends_on:
       - backend
     networks:
@@ -47,7 +48,9 @@ services:
       context: backend
       target: builder
     ports:
-      - '8000:8000'
+      - '8000:80'
+    expose:
+      - 8000
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_USER=root
@@ -61,7 +64,6 @@ services:
     stop_signal: SIGINT
     networks:
       - backnet
-      - frontnet
     
   phpmyadmin:
     depends_on:
@@ -82,8 +84,12 @@ services:
       - 80:80
     depends_on: 
       - backend
+      - frontend
     networks:
+      - backnet
       - frontnet
+    expose:
+      - 80
 volumes:
   mysql-data:
 networks:

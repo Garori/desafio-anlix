@@ -10,13 +10,15 @@ app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
 # mysql = MySQL()
 
 
-@app.route('/data', methods=['GET'])
+@app.route('/api/data', methods=['GET'])
 def get_data():
     cur = mysql.connection.cursor()
     cur.execute('''SELECT * FROM pacientes''')
     data = cur.fetchall()
     cur.close()
-    print(data)
+    # print(data)
+    # print("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+    # print(jsonify(data))
     return jsonify(data)
 
 
