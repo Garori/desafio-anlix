@@ -1,59 +1,47 @@
-# Frontend
+# Desafio-Anlix
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.8.
+---
 
-## Development server
 
-To start a local development server, run:
 
-```bash
-ng serve
-```
+## Instructions:
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+* Make sure you have Docker installed and running
+* Make sure you have docker-compose installed and avaible on a terminal
+* Clone the project
+* Open the root folder ("desafio-anlix") on your preferred terminal
+* Run the command `docker-compose up -d --build`
+* Go to the URL "[http://localhost:4200](http://localhost:4200 "Website for desafio-anlix")"
 
-## Code scaffolding
+You can contact me about any doubts you have.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+My informations are on the end of this README.
 
-```bash
-ng generate component component-name
-```
+## Front-end
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The front-end was made with Angular v19.
 
-```bash
-ng generate --help
-```
+This choice was made for I was more experienced in it and also would be easier to make something decent.
 
-## Building
+## Back-end
 
-To build the project run:
+The back-end framwork used was flask, I admit I knew nothing about it until starting to do this project.
 
-```bash
-ng build
-```
+The choice for using Flask was because the only other back-end framework I had contact with was Laravel and I didn't know If I wwould be able to remember how to use it in time for the deadline. So as I am used to developing in python I thought learning flask on-the-go was the way-to-go.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Database
 
-## Running unit tests
+For the database I used mysql. To do that I converted the files you gave me to sql and used them to seed the DB.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+To convert the files into a .sql file I used:
 
-```bash
-ng test
-```
+* For the JSON "pacientes" -> the website "[https://table.studio/convert/json/to/sql](https://table.studio/convert/json/to/sql "Site used to convert .json into .sql")" (For the record: I wouldn't use a website to this this if the data was real)
+* For the other extensionless files: I coded a python program to do that for me it is named "ajuda.py" and can be found on the "other" folder.
 
-## Running end-to-end tests
+I had to tinker a bit with the files so they would contain the, more or less, right types for each of the columns and other configurations.
 
-For end-to-end (e2e) testing, run:
+### phpMyAdmin
 
-```bash
-ng e2e
-```
+I installed it on the docker also to make it easier to look at the database's tables.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+You can access it by going to the URL: "[http://localhost:8090](http://localhost:8090 "phpMyAdmin")"

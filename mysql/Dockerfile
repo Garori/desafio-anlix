@@ -1,4 +1,4 @@
-#essa Docker File só é nescessária por causa do encionding do mysql
+#essa Dockerfile só é nescessária por causa do encionding do mysql
 #toda vez que eu seedava o bd os caractéres especiais vinham errados/quebrados
 #depois de pesquisar muito ví que é pq o docker cria um ambiente ubuntu/linux que vem por padrão 
 #com um enconding onde os caractéres especiais não funcionam direito e, ao mesmo tempo,

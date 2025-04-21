@@ -10,7 +10,7 @@ services:
     # command: '--default-authentication-plugin=mysql_native_password'
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./sqls_to_seed_the_db:/docker-entrypoint-initdb.d
+      - ./mysql/sql_files_to_seed_the_db:/docker-entrypoint-initdb.d
     environment: 
       MYSQL_ROOT_PASSWORD: 123321
       MYSQL_DATABASE: desafio_anlix
@@ -41,7 +41,7 @@ services:
       - frontnet
     volumes:
       - ./frontend:/frontend
-      - /frontend/node_modules
+      - /frontend/node_modules/
     # command: ng serve --host 0.0.0.0 --port 4200 --poll=2000
   backend:
     build: 
@@ -77,17 +77,15 @@ services:
       MYSQL_ROOT_PASSWORD: 123321
     networks:
       - backnet
-  proxy:
-    build: proxy
+  nginx:
+    build: nginx
     restart: always
     ports:
       - 80:80
     depends_on: 
       - backend
-      - frontend
     networks:
       - backnet
-      - frontnet
     expose:
       - 80
 volumes:
