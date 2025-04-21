@@ -1,0 +1,66 @@
+import os
+with open("./sqls_to_seed_the_db/indice-cardiaco.sql", "w") as saida:
+    saida.write("""USE desafio_anlix
+CREATE TABLE indice_cardiaco_table (
+cpf VARCHAR(14) NOT NULL,
+epoch BIGINT NOT NULL,
+indice_cardiaco DOUBLE NOT NULL,
+date DATE
+);
+INSERT INTO indice_cardiaco_table (cpf, epoch, indice_cardiaco)
+VALUES""")
+    to_write = ""
+    for arq in os.listdir("./database/dados/indice_cardiaco"):
+        with open("./database/dados/indice_cardiaco/" + arq, "r") as f:
+            # print(f.read())
+            for line in f.readlines()[1:]:
+                line=line.replace("\n","")
+                entry = "\n("
+                for i, col in enumerate(line.split(" ")):
+                    if i == 0:
+                        entry += f"'{col}',"
+                    elif i==1:
+                        entry += f"{col},"
+                    else:
+                        entry += f"{col}"
+                    # saida.write(f"({line})")
+                entry += "),"
+                to_write += entry
+    to_write = to_write[:-1] + ";\n"
+    saida.write(to_write)
+    saida.write("UPDATE indice_cardiaco_table SET date = FROM_UNIXTIME(epoch);\n")
+    # saida.write("SELECT to_timestamp(epoch) as date FROM indice_cardiaco;\n")
+    saida.write("ALTER TABLE indice_cardiaco_table\nDROP COLUMN epoch;")
+
+with open("./sqls_to_seed_the_db/indice-pulmonar.sql", "w") as saida:
+    saida.write("""USE desafio_anlix
+CREATE TABLE indice_pulmonar_table (
+cpf VARCHAR(14) NOT NULL,
+epoch BIGINT NOT NULL,
+indice_pulmonar DOUBLE NOT NULL,
+date DATE
+);
+INSERT INTO indice_pulmonar_table (cpf, epoch, indice_pulmonar)
+VALUES""")
+    to_write = ""
+    for arq in os.listdir("./database/dados/indice_pulmonar"):
+        with open("./database/dados/indice_pulmonar/" + arq, "r") as f:
+            # print(f.read())
+            for line in f.readlines()[1:]:
+                line = line.replace("\n", "")
+                entry = "\n("
+                for i, col in enumerate(line.split(" ")):
+                    if i == 0:
+                        entry += f"'{col}',"
+                    elif i == 1:
+                        entry += f"{col},"
+                    else:
+                        entry += f"{col}"
+                    # saida.write(f"({line})")
+                entry += "),"
+                to_write += entry
+    to_write = to_write[:-1] + ";\n"
+    saida.write(to_write)
+    saida.write("UPDATE indice_pulmonar_table SET date = FROM_UNIXTIME(epoch);\n")
+    # saida.write("SELECT to_timestamp(epoch) as date FROM indice_pulmonar;\n")
+    saida.write("ALTER TABLE indice_pulmonar_table\nDROP COLUMN epoch;")
