@@ -3,19 +3,19 @@ from flask_mysqldb import MySQL
 import os
 app = Flask(__name__)
 mysql = MySQL(app)
-# app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
-# app.config["MYSQL_DB"] = os.environ.get("MYSQL_DB")
-# app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
-# app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
-app.config["MYSQL_USER"] = "root"
-app.config["MYSQL_DB"] = "anlix"
-app.config["MYSQL_PASSWORD"] = ""
-app.config["MYSQL_HOST"] = "localhost"
+app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
+app.config["MYSQL_DB"] = os.environ.get("MYSQL_DB")
+app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
+app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
+# app.config["MYSQL_USER"] = "root"
+# app.config["MYSQL_DB"] = "anlix"
+# app.config["MYSQL_PASSWORD"] = ""
+# app.config["MYSQL_HOST"] = "localhost"
 
 # mysql = MySQL()
 
 # Consultar, para cada paciente, cada uma das características individualmente e cada uma delas sendo a mais recente disponível;
-@app.route('/api/patient/indice_cardiaco_last', methods=['GET'])
+@app.route('/api/patient/indice_cardiaco_last', methods=['POST'])
 def getPatientLastIndiceCardiaco():
     form = request.get_json()
     cur = mysql.connection.cursor()
@@ -32,7 +32,7 @@ def getPatientLastIndiceCardiaco():
 
 
 #Consultar, para cada paciente, cada uma das características individualmente e cada uma delas sendo a mais recente disponível;
-@app.route('/api/patient/indice_pulmonar_last', methods=['GET'])
+@app.route('/api/patient/indice_pulmonar_last', methods=['POST'])
 def getPatientLastIndicePulmonar():
     form = request.get_json()
     cur = mysql.connection.cursor()
@@ -49,7 +49,7 @@ def getPatientLastIndicePulmonar():
 
 
 #Consultar em uma única chamada, todas as características de um paciente, com os valores mais recentes de cada uma
-@app.route('/api/patient/both_indices_last', methods=['GET'])
+@app.route('/api/patient/both_indices_last', methods=['POST'])
 def getPatientLastIndices():
     form = request.get_json()
     cur = mysql.connection.cursor()
@@ -72,7 +72,7 @@ def getPatientLastIndices():
     return jsonify(res)
 
 # Consultar para uma determinada data (dia, mês e ano), todas as características existentes de todos os pacientes da base de dados;
-@app.route('/api/dates/both_indices', methods=['GET'])
+@app.route('/api/dates/both_indices', methods=['POST'])
 def getDatesBothIndices():
     # poderia ter feito com join ou union aqui de alguma forma, mas essa foi a forma que ficou mais fácil de configurar a saída
     # sei que não é a melhor forma de fazer pq tem duas chamadas para o bd
@@ -115,7 +115,7 @@ def getDatesBothIndices():
 
 
 #EXTRA Rota que consulta algum indice, ou ambos, de um dado paciente dentro de um intervalo de dias
-@app.route('/api/patient/dates', methods=['GET'])
+@app.route('/api/patient/dates', methods=['POST'])
 def getPatientIndiceByDates():
     form = request.get_json()
     if "final_date" not in form.keys():
@@ -163,7 +163,7 @@ def getPatientIndiceByDates():
     return jsonify(final_res)
 
 # Consultar o valor mais recente de uma característica de um paciente que esteja entre um intervalo de valores a ser especificado na chamada da API;
-@app.route('/api/patient/indice_between', methods=['GET'])
+@app.route('/api/patient/indice_between', methods=['POST'])
 def getPatientIndiceBetween():
     form = request.get_json()
     cur = mysql.connection.cursor()
@@ -183,20 +183,22 @@ def getPatientIndiceBetween():
 
 #Consultar pacientes que contenham um nome ou parte de um nome a ser especificado na chamada da API.
 # +email e cpf
-@app.route('/api/patient', methods=['GET'])
-def getPatient():
-    form = request.get_json()
+@app.route('/api/patient/<method>/<search>', methods=['GET'])
+def getPatient(method,search):
+    # form = request.get_json()
     cur = mysql.connection.cursor()
-    if form["column"] in ["nome", "email"]:
+    if method in ["nome", "email"]:
         cur.execute(
             f'''SELECT
             id,nome,idade,cpf,rg,data_nasc,email,sexo,mae,pai,cep,endereco,numero,bairro,cidade,estado,telefone_fixo,celular,altura,peso,tipo_sanguineo,cor,signo
-            FROM pacientes WHERE {form["column"]} LIKE "%{form["search"]}%" ORDER BY {form["column"]}''')
-    if form["column"] == "cpf":
+            FROM pacientes WHERE {method} LIKE "%{search}%" ORDER BY {method}''')
+    elif method == "cpf":
         cur.execute(
         f'''SELECT
             id,nome,idade,cpf,rg,data_nasc,email,sexo,mae,pai,cep,endereco,numero,bairro,cidade,estado,telefone_fixo,celular,altura,peso,tipo_sanguineo,cor,signo
-            FROM pacientes WHERE {form["column"]} = "{form["search"]}"''')
+            FROM pacientes WHERE {method} = "{search}"''')
+    else:
+        return jsonify([])
     
     data = cur.fetchall()
     columns = [x[0] for x in cur.description]
