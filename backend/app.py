@@ -19,7 +19,7 @@ app.config["MYSQL_HOST"] = "localhost"
 def getPatientLastIndiceCardiaco():
     form = request.get_json()
     cur = mysql.connection.cursor()
-    cur.execute(s
+    cur.execute(
         f'''SELECT * FROM indice_cardiaco_table WHERE datetime = (select max(datetime) from indice_cardiaco_table WHERE cpf = "{form["cpf"]}")''')
     data = cur.fetchall()
     columns = [x[0] for x in cur.description]
