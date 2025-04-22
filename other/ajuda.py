@@ -1,11 +1,11 @@
 import os
-with open("./sqls_to_seed_the_db/indice-cardiaco.sql", "w") as saida:
+with open("../mysql/sql_files_to_seed_the_db/indice-cardiaco.sql", "w") as saida:
     saida.write("""USE desafio_anlix
 CREATE TABLE indice_cardiaco_table (
 cpf VARCHAR(14) NOT NULL,
 epoch BIGINT NOT NULL,
 indice_cardiaco DOUBLE NOT NULL,
-date DATE
+datetime_cardiaco DATETIME
 );
 INSERT INTO indice_cardiaco_table (cpf, epoch, indice_cardiaco)
 VALUES""")
@@ -28,17 +28,17 @@ VALUES""")
                 to_write += entry
     to_write = to_write[:-1] + ";\n"
     saida.write(to_write)
-    saida.write("UPDATE indice_cardiaco_table SET date = FROM_UNIXTIME(epoch);\n")
+    saida.write("UPDATE indice_cardiaco_table SET datetime_cardiaco = FROM_UNIXTIME(epoch);\n")
     # saida.write("SELECT to_timestamp(epoch) as date FROM indice_cardiaco;\n")
     saida.write("ALTER TABLE indice_cardiaco_table\nDROP COLUMN epoch;")
 
-with open("./sqls_to_seed_the_db/indice-pulmonar.sql", "w") as saida:
+with open("../mysql/sql_files_to_seed_the_db/indice-pulmonar.sql", "w") as saida:
     saida.write("""USE desafio_anlix
 CREATE TABLE indice_pulmonar_table (
 cpf VARCHAR(14) NOT NULL,
 epoch BIGINT NOT NULL,
 indice_pulmonar DOUBLE NOT NULL,
-date DATE
+datetime DATETIME
 );
 INSERT INTO indice_pulmonar_table (cpf, epoch, indice_pulmonar)
 VALUES""")
@@ -61,6 +61,6 @@ VALUES""")
                 to_write += entry
     to_write = to_write[:-1] + ";\n"
     saida.write(to_write)
-    saida.write("UPDATE indice_pulmonar_table SET date = FROM_UNIXTIME(epoch);\n")
+    saida.write("UPDATE indice_pulmonar_table SET datetime = FROM_UNIXTIME(epoch);\n")
     # saida.write("SELECT to_timestamp(epoch) as date FROM indice_pulmonar;\n")
     saida.write("ALTER TABLE indice_pulmonar_table\nDROP COLUMN epoch;")

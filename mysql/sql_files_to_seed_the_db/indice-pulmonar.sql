@@ -3,7 +3,7 @@ CREATE TABLE indice_pulmonar_table (
 cpf VARCHAR(14) NOT NULL,
 epoch BIGINT NOT NULL,
 indice_pulmonar DOUBLE NOT NULL,
-date DATE
+datetime DATETIME
 );
 INSERT INTO indice_pulmonar_table (cpf, epoch, indice_pulmonar)
 VALUES
@@ -6007,6 +6007,6 @@ VALUES
 ('974.340.772-39',1617115030,0.378161),
 ('777.421.360-07',1617084505,0.238110),
 ('272.846.051-54',1617078362,0.422527);
-UPDATE indice_pulmonar_table SET date = FROM_UNIXTIME(epoch);
+UPDATE indice_pulmonar_table SET datetime = FROM_UNIXTIME(epoch);
 ALTER TABLE indice_pulmonar_table
 DROP COLUMN epoch;

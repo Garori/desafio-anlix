@@ -3,7 +3,7 @@ CREATE TABLE indice_cardiaco_table (
 cpf VARCHAR(14) NOT NULL,
 epoch BIGINT NOT NULL,
 indice_cardiaco DOUBLE NOT NULL,
-date DATE
+datetime_cardiaco DATETIME
 );
 INSERT INTO indice_cardiaco_table (cpf, epoch, indice_cardiaco)
 VALUES
@@ -6007,6 +6007,6 @@ VALUES
 ('974.340.772-39',1617104661,0.320474),
 ('974.642.524-20',1617116137,0.335950),
 ('285.773.707-63',1617155043,0.201683);
-UPDATE indice_cardiaco_table SET date = FROM_UNIXTIME(epoch);
+UPDATE indice_cardiaco_table SET datetime_cardiaco = FROM_UNIXTIME(epoch);
 ALTER TABLE indice_cardiaco_table
 DROP COLUMN epoch;
