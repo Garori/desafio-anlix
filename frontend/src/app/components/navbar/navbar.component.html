@@ -1,0 +1,27 @@
+<nav class="navbar">
+    <div class="navbar-logo">
+        <img routerLink="/" src="logo.svg" alt="My App Logo" />
+    </div>
+    <div class="navbar-links">
+        <button mat-raised-button [matMenuTriggerFor]="menuPacientes">Pacientes</button>
+        <mat-menu #menuPacientes="matMenu">
+            <a mat-menu-item routerLink="/search">Procurar Paciente</a>
+            <a mat-menu-item>...</a>
+        </mat-menu>
+        <button mat-raised-button [matMenuTriggerFor]="menuIndices">Indices</button>
+        <mat-menu #menuIndices="matMenu">
+            <button mat-menu-item routerLink="/indices">Por data</button>
+            <button mat-menu-item>...</button>
+        </mat-menu>
+        <button mat-raised-button [matMenuTriggerFor]="menuDatas" routerLink="/datas">Datas</button>
+        <mat-menu #menuDatas="matMenu">
+            <button mat-menu-item>Procurar Paciente</button>
+            <button mat-menu-item>...</button>
+        </mat-menu>
+        <!-- <li><a routerLink="/about">About</a></li>
+        <li><a routerLink="/contact">Blog</a></li> -->
+    </div>
+    <div class="navbar-actions">
+        <!-- Add login/logout buttons or user-related actions here -->
+    </div>
+</nav>

@@ -1,1 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+html, body { height: 100%; }
+body {
+    background-color: #f3f3f3;margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+mat-card {
+    filter: drop-shadow(1px 1px 1px #00000033) !important;
+}
+main{
+    padding: 3vh 10vw;
+}

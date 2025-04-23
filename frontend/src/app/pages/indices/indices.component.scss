@@ -1,0 +1,62 @@
+#indicesForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 30vh;
+    justify-content: flex-start;
+    > button{
+        margin-bottom: 1vh;;
+    }
+}
+
+#formSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#resultsDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: baseline;
+
+    >mat-card {
+        margin: 2%;
+        min-width: 20%;
+        max-width: 95%;
+        min-height: min-content;
+        filter: drop-shadow(1px 1px 1px #00000033);
+
+        >mat-card-header {
+            >.mat-mdc-card-header-text {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                max-width: 100%;
+            }
+        }
+
+        >mat-divider {
+            width: 90%;
+            align-self: center;
+            margin-bottom: 1vh;
+        }
+    }
+}
+
+
+#pageTitle {
+    font-size: 3em;
+}
+
+mat-form-field {
+    width: 50%;
+}
+mat-card-title{
+    cursor: pointer;
+}

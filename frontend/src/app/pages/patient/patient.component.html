@@ -1,0 +1,73 @@
+<main>
+    <h1>Paciente: {{this.patientData["nome"]}}</h1>
+    <section id="cardsSection">
+        <mat-card>
+            <mat-card-header>Dados gerais do paciente</mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content *ngFor="let item of this.general_data; index as i">
+                <p><b>{{this.general_data_columns[i]}}:</b> {{this.patientData[item]}}</p>
+            </mat-card-content>
+        </mat-card>
+        <mat-card>
+            <mat-card-header>Dados médicos do paciente</mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content *ngFor="let item of this.medical_data; index as i">
+                <p><b>{{this.medical_data_columns[i]}}:</b> {{this.patientData[item]}}</p>
+            </mat-card-content>
+        </mat-card>
+        <mat-card>
+            <mat-card-header>Painel de Comando</mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-actions>
+                <div>
+                    <button mat-raised-button [matMenuTriggerFor]="menuIndices">Último índice</button>
+                    <mat-menu #menuIndices="matMenu">
+                        <button mat-menu-item (click)="getLastIndiceCardiaco()">Cardíaco</button>
+                        <button mat-menu-item (click)="getLastIndicePulmonar()">Pulmonar</button>
+                        <button mat-menu-item (click)="getLastIndicesBoth()">Ambos</button>
+                    </mat-menu>
+                </div>
+                <div>
+                    <button mat-raised-button [matMenuTriggerFor]="menuIndices">Histórico</button>
+                    <mat-menu #menuIndices="matMenu">
+                        <button mat-menu-item>Cardíaco</button>
+                        <button mat-menu-item>Pulmonar</button>
+                        <button mat-menu-item>Ambos</button>
+                    </mat-menu>
+                </div>
+                </mat-card-actions>
+            <mat-divider class="shrinked"></mat-divider>
+            <mat-card-content id="cardIndices">
+                <div *ngIf="data_to_show['indice_cardiaco']??'' != ''">
+                    <h4>Indice Cardíaco</h4>
+                    <p>{{data_to_show["indice_cardiaco"]}}</p>
+                    <br>
+                    <h4>Data da medição</h4>
+                    <p>{{data_to_show["datetime_cardiaco"]}}</p>
+                </div>
+                <mat-divider vertical="true" *ngIf="data_to_show['indice_cardiaco']??'' != '' && data_to_show['indice_pulmonar']??'' != ''"></mat-divider>
+                <div *ngIf="data_to_show['indice_pulmonar']??'' != ''">
+                    <h4>Indice Pulmonar</h4>
+                    <p>{{data_to_show["indice_pulmonar"]}}</p>
+                    <br>
+                    <h4>Data da medição</h4>
+                    <p>{{data_to_show["datetime_pulmonar"]}}</p>
+                </div>
+            </mat-card-content>
+        </mat-card>
+        <mat-card>
+            <mat-card-header>Dados de contato do paciente</mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content *ngFor="let item of this.contact_data; index as i">
+                <p><b>{{this.contact_data_columns[i]}}:</b> {{this.patientData[item]}}</p>
+            </mat-card-content>
+        </mat-card>
+        <mat-card>
+            <mat-card-header>Outros dados do paciente</mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content *ngFor="let item of this.other_data; index as i">
+                <p><b>{{this.other_data_columns[i]}}:</b> {{this.patientData[item]}}</p>
+            </mat-card-content>
+        </mat-card>
+    </section>
+</main>

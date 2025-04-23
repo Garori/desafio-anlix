@@ -1,11 +1,40 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-// import { DetailsComponent } from './details/details.component';
+import { HomeComponent } from './pages/home/home.component';
+import { SearchComponent } from './pages/search/search.component';
+import { PatientComponent } from './pages/patient/patient.component';
+import { IndicesComponent } from './pages/indices/indices.component';
+import { ExportToCSVComponent } from './components/export-to-csv/export-to-csv.component';
+
 const routeConfig: Routes = [
     {
         path: '',
         component: HomeComponent,
         title: 'Home page',
+    },
+    {
+        path: 'search',
+        component: SearchComponent,
+        title: 'Search page',
+    },
+    {
+        path: 'patient/:id',
+        component: PatientComponent,
+        title: 'Paciente',
+    },
+    {
+        path: 'indices',
+        component: IndicesComponent,
+        title: 'Indices',
+    },
+    {
+        path: 'indices/:id',
+        component: IndicesComponent,
+        title: 'Indices Paciente',
+    },
+    {
+        path: 'teste',
+        component: ExportToCSVComponent,
+        title: 'Indices Paciente',
     }
 ]
 export default routeConfig;

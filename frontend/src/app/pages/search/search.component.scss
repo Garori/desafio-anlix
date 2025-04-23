@@ -1,0 +1,65 @@
+#searchForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 30vh;
+    justify-content: flex-start;
+}
+
+#resultsDiv {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    > mat-card {
+        margin: 2.5%;
+        min-width: 20%;
+        max-width: 95%;
+        min-height: 15vh;
+        cursor: pointer;
+        filter: drop-shadow(1px 1px 1px #00000033);
+        > mat-card-header {
+            > .mat-mdc-card-header-text {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    max-width: 100%;
+                }
+        }
+
+        > mat-divider {
+            width: 90%;
+            align-self: center;
+            margin-bottom: 1vh;
+        }
+    }
+}
+
+#searchSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#labelSearchInput {
+    font-size: 3em;
+    margin-bottom: 3vh;
+}
+
+#labelRadioSelect {
+    font-size: 2em;
+}
+
+#searchInput {
+    width: 50%;
+}
+
+#pageTitle{
+    font-size: 3em;
+}
+
+mat-form-field {
+    width: 50%;
+}

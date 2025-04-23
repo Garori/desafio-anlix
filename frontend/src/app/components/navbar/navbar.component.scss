@@ -1,0 +1,72 @@
+@use "@angular/material" as mat;
+
+main{
+    padding: 3vh;
+}
+nav {
+    background-color: #000000;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    // border-bottom-style: solid;
+    // border-bottom-width: 2px;
+    // border-bottom-color: black;
+    filter: drop-shadow(0px 2px 5px #000000aa);
+    
+    padding: 1.5vh 3vh;
+    // width: 100%;
+    max-height: 12vh;
+    min-height: 7vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+}
+
+.navbar-logo {
+    margin-right: 3vw;
+    height: 5vh;
+    img {
+        height: 100%;
+        filter: drop-shadow(5px 5px 5px #000000aa);
+    }
+}
+
+.navbar-links {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    min-height: min-content;
+    max-height: min-content;
+    // padding-top: 1vh;
+    @include mat.expansion-overrides((
+        header-text-color: #005cbb,
+        header-expanded-state-height: 5vh,
+        header-collapsed-state-height: 5vh
+    ));
+    a {
+        padding: 0px;
+    }
+    mat-accordion{
+        align-self: flex-start;
+        min-height: 4vh;
+        max-height: 4vh;
+
+        // min-height: min-content;
+    }
+    .mat-expansion-panel-content-wrapper {
+        max-height: 0px;
+    }
+
+    > * {
+        margin-right: 1vw;
+    }
+    
+    > button{
+        border-radius: 10px;
+    }
+    
+}
+//     > button {
+//         width: 
+//     }
+// }

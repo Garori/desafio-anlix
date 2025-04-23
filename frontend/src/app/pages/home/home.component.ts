@@ -1,5 +1,5 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { IntegrationAPIService } from '../integration-api.service';
+import { IntegrationAPIService } from '../../integration-api.service';
 
 
 @Component({
@@ -11,10 +11,10 @@ import { IntegrationAPIService } from '../integration-api.service';
 export class HomeComponent {
   constructor(private integrationAPIService:IntegrationAPIService ){
     
-    this.integrationAPIService.getPacientes().subscribe(res =>
-    {
-      console.log(res);
-    });
+    // this.integrationAPIService.getPacientes().subscribe(res =>
+    // {
+    //   console.log(res);
+    // });
     // console.log()
   }
   
