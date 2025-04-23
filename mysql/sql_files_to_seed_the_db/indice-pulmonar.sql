@@ -1,5 +1,6 @@
 USE desafio_anlix
 CREATE TABLE indice_pulmonar_table (
+id BIGINT,
 cpf VARCHAR(14) NOT NULL,
 epoch BIGINT NOT NULL,
 indice_pulmonar DOUBLE NOT NULL,
@@ -6008,5 +6009,7 @@ VALUES
 ('777.421.360-07',1617084505,0.238110),
 ('272.846.051-54',1617078362,0.422527);
 UPDATE indice_pulmonar_table SET datetime = FROM_UNIXTIME(epoch);
-ALTER TABLE indice_pulmonar_table
+UPDATE indice_pulmonar_table ipt, pacientes pct SET ipt.id = pct.id WHERE ipt.cpf = pct.cpf;ALTER TABLE indice_pulmonar_table
 DROP COLUMN epoch;
+ALTER TABLE indice_pulmonar_table
+DROP COLUMN cpf;

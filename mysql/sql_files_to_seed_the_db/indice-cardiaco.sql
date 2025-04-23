@@ -1,5 +1,6 @@
 USE desafio_anlix
 CREATE TABLE indice_cardiaco_table (
+id BIGINT,
 cpf VARCHAR(14) NOT NULL,
 epoch BIGINT NOT NULL,
 indice_cardiaco DOUBLE NOT NULL,
@@ -6008,5 +6009,7 @@ VALUES
 ('974.642.524-20',1617116137,0.335950),
 ('285.773.707-63',1617155043,0.201683);
 UPDATE indice_cardiaco_table SET datetime = FROM_UNIXTIME(epoch);
-ALTER TABLE indice_cardiaco_table
+UPDATE indice_cardiaco_table ict, pacientes pct SET ict.id = pct.id WHERE ict.cpf = pct.cpf;ALTER TABLE indice_cardiaco_table
 DROP COLUMN epoch;
+ALTER TABLE indice_cardiaco_table
+DROP COLUMN cpf;

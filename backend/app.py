@@ -3,20 +3,24 @@ from flask_mysqldb import MySQL
 import os
 app = Flask(__name__)
 mysql = MySQL(app)
+
+
 app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
 app.config["MYSQL_DB"] = os.environ.get("MYSQL_DB")
 app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
 app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
+
 # app.config["MYSQL_USER"] = "root"
 # app.config["MYSQL_DB"] = "anlix"
 # app.config["MYSQL_PASSWORD"] = ""
 # app.config["MYSQL_HOST"] = "localhost"
 
+
 # mysql = MySQL()
 
 # Consultar, para cada paciente, cada uma das características individualmente e cada uma delas sendo a mais recente disponível;
 @app.route('/api/patient/<id>/indice_cardiaco_last', methods=['GET'])
-def getPatientLastIndiceCardiaco():
+def getPatientLastIndiceCardiaco(id):
     # form = request.get_json()
     cur = mysql.connection.cursor()
     cur.execute(
@@ -34,7 +38,7 @@ def getPatientLastIndiceCardiaco():
 
 #Consultar, para cada paciente, cada uma das características individualmente e cada uma delas sendo a mais recente disponível;
 @app.route('/api/patient/<id>/indice_pulmonar_last', methods=['GET'])
-def getPatientLastIndicePulmonar():
+def getPatientLastIndicePulmonar(id):
     # form = request.get_json()
     cur = mysql.connection.cursor()
     cur.execute(
@@ -52,7 +56,7 @@ def getPatientLastIndicePulmonar():
 
 #Consultar em uma única chamada, todas as características de um paciente, com os valores mais recentes de cada uma
 @app.route('/api/patient/<id>/both_indices_last', methods=['GET'])
-def getPatientLastIndices():
+def getPatientLastIndices(id):
     # form = request.get_json()
     cur = mysql.connection.cursor()
     cur.execute(f""" WITH
@@ -83,43 +87,43 @@ def getDatesBothIndices():
         form["final_date"] = form["date"]
     cur = mysql.connection.cursor()
     cur.execute(f"""
-        SELECT pacientes.id, indice_cardiaco_table.cpf, pacientes.nome, indice_cardiaco_table.indice_cardiaco, indice_cardiaco_table.datetime
+        SELECT pacientes.id, pacientes.nome, indice_cardiaco_table.indice_cardiaco, indice_cardiaco_table.datetime
         FROM indice_cardiaco_table 
         JOIN pacientes 
-        ON pacientes.cpf=indice_cardiaco_table.cpf
+        ON pacientes.id=indice_cardiaco_table.id
         WHERE indice_cardiaco_table.datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59'
         ORDER BY indice_cardiaco_table.datetime ASC
         """)
     cardiaco = cur.fetchall()
     columns_cardiaco = [x[0] for x in cur.description]
-    columns_cardiaco = columns_cardiaco[3:]
+    columns_cardiaco = columns_cardiaco[2:]
     cur.execute(f"""
-        SELECT pacientes.id, indice_pulmonar_table.cpf, pacientes.nome, indice_pulmonar_table.indice_pulmonar, indice_pulmonar_table.datetime 
+        SELECT pacientes.id, pacientes.nome, indice_pulmonar_table.indice_pulmonar, indice_pulmonar_table.datetime 
         FROM indice_pulmonar_table 
-        INNER JOIN pacientes ON pacientes.cpf=indice_pulmonar_table.cpf
+        INNER JOIN pacientes ON pacientes.id=indice_pulmonar_table.id
         WHERE indice_pulmonar_table.datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59'
         ORDER BY indice_pulmonar_table.datetime ASC
         """)
     pulmonar = cur.fetchall()
     columns_pulmonar = [x[0] for x in cur.description]
-    columns_pulmonar = columns_pulmonar[3:]
+    columns_pulmonar = columns_pulmonar[2:]
     print(columns_cardiaco)
     res = {}
     for result in cardiaco:
         if str(result[0]) in res.keys():
-            res[str(result[0])]["cardiaco"].append(dict(zip(columns_cardiaco, result[3:])))
+            res[str(result[0])]["cardiaco"].append(dict(zip(columns_cardiaco, result[2:])))
             res[str(result[0])]["cardiaco"][-1]["datetime"] = res[str(result[0])]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
         else:
             res[str(result[0])] = {"cpf":result[1],"nome":result[2],"cardiaco":[],"pulmonar":[]}
-            res[str(result[0])]["cardiaco"].append(dict(zip(columns_cardiaco, result[3:])))
+            res[str(result[0])]["cardiaco"].append(dict(zip(columns_cardiaco, result[2:])))
             res[str(result[0])]["cardiaco"][-1]["datetime"] = res[str(result[0])]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
     for result in pulmonar:
         if str(result[0]) in res.keys():
-            res[str(result[0])]["pulmonar"].append(dict(zip(columns_pulmonar, result[3:])))
+            res[str(result[0])]["pulmonar"].append(dict(zip(columns_pulmonar, result[2:])))
             res[str(result[0])]["pulmonar"][-1]["datetime"] = res[str(result[0])]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
         else:
             res[str(result[0])] = {"cpf":result[1],"nome":result[2],"cardiaco":[],"pulmonar":[]}
-            res[str(result[0])]["pulmonar"].append(dict(zip(columns_pulmonar, result[3:])))
+            res[str(result[0])]["pulmonar"].append(dict(zip(columns_pulmonar, result[2:])))
             res[str(result[0])]["pulmonar"][-1]["datetime"] = res[str(result[0])]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
     final_res = []
     for id in res.keys():
@@ -138,7 +142,7 @@ def getPatientIndiceByDates(id):
     cur = mysql.connection.cursor()
     if form["type"] in ["cardiaco", "both"]:
         cur.execute(f"""
-            SELECT * FROM indice_cardiaco_table WHERE cpf = "{form["cpf"]}" AND (datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59')""")
+            SELECT * FROM indice_cardiaco_table WHERE id = "{id}" AND (datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59')""")
         cardiaco = cur.fetchall()
         columns = [x[0] for x in cur.description]
         columns = columns[1:]
@@ -184,7 +188,8 @@ def getPatientIndiceBetween():
     table = "indice_cardiaco_table" if form["tipo"] == "cardiaco" else "indice_pulmonar_table"
     indice = table.replace("_table", "")
     cur.execute(
-        f'''SELECT * FROM {table} WHERE cpf = "{form["cpf"]}" AND ({indice} BETWEEN {form["indice_min"]} AND {form["indice_max"]})''')
+        f'''SELECT TOP 1 * FROM {table} WHERE cpf = "{form["cpf"]}" AND ({indice} BETWEEN {form["indice_min"]} AND {form["indice_max"]})
+        ORDER BY datetime DESC''')
     data = cur.fetchall()
     columns = [x[0] for x in cur.description]
     res = []

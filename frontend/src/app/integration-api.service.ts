@@ -16,7 +16,7 @@ export class IntegrationAPIService {
       "Access-Control-Allow-Origin": "*",
       'Access-Control-Allow-Headers': '*',
       'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Methods': '*'
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
     })
     return this.http.get(`${this.baseURL}/patient/${method}/${search}`,{headers:headers})
   }
@@ -26,7 +26,7 @@ export class IntegrationAPIService {
       "Access-Control-Allow-Origin": "*",
       'Access-Control-Allow-Headers': '*',
       'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Methods': '*'
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
     })
     return this.http.get(`${this.baseURL}/patient/${id}`, { headers: headers })
   }
@@ -36,7 +36,7 @@ export class IntegrationAPIService {
       "Access-Control-Allow-Origin": "*",
       'Access-Control-Allow-Headers': '*',
       'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Methods': '*'
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
     })
     return this.http.get(`${this.baseURL}/patient/${id}/indice_cardiaco_last`, { headers: headers })
   }
@@ -46,7 +46,7 @@ export class IntegrationAPIService {
       "Access-Control-Allow-Origin": "*",
       'Access-Control-Allow-Headers': '*',
       'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Methods': '*'
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
     })
     return this.http.get(`${this.baseURL}/patient/${id}/indice_pulmonar_last`, { headers: headers })
   }
@@ -56,7 +56,7 @@ export class IntegrationAPIService {
       "Access-Control-Allow-Origin": "*",
       'Access-Control-Allow-Headers': '*',
       'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Methods': '*'
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
     })
     return this.http.get(`${this.baseURL}/patient/${id}/both_indices_last`, { headers: headers })
   }
@@ -66,7 +66,7 @@ export class IntegrationAPIService {
       "Access-Control-Allow-Origin": "*",
       'Access-Control-Allow-Headers': '*',
       'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Methods': '*'
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
     })
     return this.http.post(`${this.baseURL}/dates/both_indices`, body,{ headers: headers })
   }

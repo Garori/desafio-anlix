@@ -43,7 +43,7 @@ export class PatientComponent {
     // "telefone_fixo": "(95) 3783-9661",
     // "tipo_sanguineo": "A-"
   }
-  data_to_show = {
+  data_to_show:{[key:string]:any} = {
     "indice_cardiaco":"",
     "indice_pulmonar":"",
     "datetime_cardiaco": "",
@@ -58,11 +58,11 @@ export class PatientComponent {
   other_data = ["cor", "signo"]
   other_data_columns = ["Cor", "Signo"]
   constructor(private integrationAPIService: IntegrationAPIService, private route: ActivatedRoute){
-  // this.integrationAPIService.getPatientById(this.route.snapshot.paramMap.get("id")??"-1").subscribe(res =>
-  //   {
-  //     this.patientData = res[0]
-  //     console.log(this.patientData)
-  //   });
+  this.integrationAPIService.getPatientById(this.route.snapshot.paramMap.get("id")??"-1").subscribe(res =>
+    {
+      this.patientData = res[0]
+      console.log(this.patientData)
+    });
   }
 
   getLastIndiceCardiaco(){
@@ -80,7 +80,13 @@ export class PatientComponent {
   }
   getLastIndicesBoth() {
     this.integrationAPIService.getPatientIndicePulmonarLast(this.route.snapshot.paramMap.get("id") ?? "-1").subscribe(res => {
-      this.data_to_show = res[0];
+      for (let key in ["indice_cardiaco","indice_pulmonar","datetime_cardiaco","datetime_pulmonar"]){
+        try {
+          this.data_to_show[key] = res[0][key];
+        } catch (error) {
+          this.data_to_show[key] = res[1][key];
+        }
+      }
       console.log(this.data_to_show);
     });
   }
