@@ -87,7 +87,7 @@ def getDatesBothIndices():
         form["final_date"] = form["date"]
     cur = mysql.connection.cursor()
     cur.execute(f"""
-        SELECT pacientes.id, pacientes.nome, indice_cardiaco_table.indice_cardiaco, indice_cardiaco_table.datetime
+        SELECT pacientes.id, pacientes.nome, pacientes.cpf, indice_cardiaco_table.indice_cardiaco, indice_cardiaco_table.datetime
         FROM indice_cardiaco_table 
         JOIN pacientes 
         ON pacientes.id=indice_cardiaco_table.id
@@ -98,7 +98,7 @@ def getDatesBothIndices():
     columns_cardiaco = [x[0] for x in cur.description]
     columns_cardiaco = columns_cardiaco[2:]
     cur.execute(f"""
-        SELECT pacientes.id, pacientes.nome, indice_pulmonar_table.indice_pulmonar, indice_pulmonar_table.datetime 
+        SELECT pacientes.id, pacientes.nome, pacientes.cpf, indice_pulmonar_table.indice_pulmonar, indice_pulmonar_table.datetime 
         FROM indice_pulmonar_table 
         INNER JOIN pacientes ON pacientes.id=indice_pulmonar_table.id
         WHERE indice_pulmonar_table.datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59'
@@ -114,7 +114,7 @@ def getDatesBothIndices():
             res[str(result[0])]["cardiaco"].append(dict(zip(columns_cardiaco, result[2:])))
             res[str(result[0])]["cardiaco"][-1]["datetime"] = res[str(result[0])]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
         else:
-            res[str(result[0])] = {"cpf":result[1],"nome":result[2],"cardiaco":[],"pulmonar":[]}
+            res[str(result[0])] = {"cpf":result[2],"nome":result[1],"cardiaco":[],"pulmonar":[]}
             res[str(result[0])]["cardiaco"].append(dict(zip(columns_cardiaco, result[2:])))
             res[str(result[0])]["cardiaco"][-1]["datetime"] = res[str(result[0])]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
     for result in pulmonar:
@@ -122,7 +122,7 @@ def getDatesBothIndices():
             res[str(result[0])]["pulmonar"].append(dict(zip(columns_pulmonar, result[2:])))
             res[str(result[0])]["pulmonar"][-1]["datetime"] = res[str(result[0])]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
         else:
-            res[str(result[0])] = {"cpf":result[1],"nome":result[2],"cardiaco":[],"pulmonar":[]}
+            res[str(result[0])] = {"cpf":result[2],"nome":result[1],"cardiaco":[],"pulmonar":[]}
             res[str(result[0])]["pulmonar"].append(dict(zip(columns_pulmonar, result[2:])))
             res[str(result[0])]["pulmonar"][-1]["datetime"] = res[str(result[0])]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
     final_res = []

@@ -79,14 +79,16 @@ export class PatientComponent {
     });
   }
   getLastIndicesBoth() {
-    this.integrationAPIService.getPatientIndicePulmonarLast(this.route.snapshot.paramMap.get("id") ?? "-1").subscribe(res => {
+    this.integrationAPIService.getPatientIndicesBothLast(this.route.snapshot.paramMap.get("id") ?? "-1").subscribe(res => {
       for (let key in ["indice_cardiaco","indice_pulmonar","datetime_cardiaco","datetime_pulmonar"]){
-        try {
-          this.data_to_show[key] = res[0][key];
-        } catch (error) {
-          this.data_to_show[key] = res[1][key];
-        }
+        // try {
+        //   this.data_to_show[key] = res[0][key];
+        // } catch (error) {
+        //   this.data_to_show[key] = res[0][key];
+        // }
+        this.data_to_show = res[0]
       }
+      console.log(res)
       console.log(this.data_to_show);
     });
   }
