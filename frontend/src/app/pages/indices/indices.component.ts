@@ -21,7 +21,7 @@ const moment = _rollupMoment || _moment;
 
 export const MY_FORMATS = {
   parse: {
-    dateInput: 'YYYY-MM-DD', // this is how your date will be parsed from Input
+    dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
   },
   display: {
     dateInput: 'DD/MM/YYYY', // this is how your date will get displayed on the Input
@@ -55,8 +55,8 @@ export class IndicesComponent {
 
   
   indicesForm = new FormGroup({
-    data: new FormControl(moment(), [Validators.required, Validators.minLength(5)]),
-    data_final: new FormControl(moment() ),
+    data: new FormControl(moment(), [Validators.required]),
+    data_final: new FormControl(moment(), [Validators.required] ),
   });
 
   handleExport(){
