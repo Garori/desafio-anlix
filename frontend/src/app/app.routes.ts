@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
+// import { HomeComponent } from './pages/home/home.component';
 import { SearchComponent } from './pages/search/search.component';
 import { PatientComponent } from './pages/patient/patient.component';
 import { IndicesComponent } from './pages/indices/indices.component';
@@ -8,8 +8,8 @@ import { ExportToCSVComponent } from './components/export-to-csv/export-to-csv.c
 const routeConfig: Routes = [
     {
         path: '',
-        component: HomeComponent,
-        title: 'Home page',
+        component: SearchComponent,
+        title: 'Search page',
     },
     {
         path: 'search',
@@ -35,6 +35,11 @@ const routeConfig: Routes = [
         path: 'teste',
         component: ExportToCSVComponent,
         title: 'Indices Paciente',
+    },
+    {
+        path: '**',
+        component: SearchComponent,
+        title: 'Search page',
     }
 ]
 export default routeConfig;
