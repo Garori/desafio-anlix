@@ -31,7 +31,7 @@
                     <button mat-raised-button [matMenuTriggerFor]="menuHistorico" >Histórico</button>
                     <mat-menu #menuHistorico="matMenu">
                         <button mat-menu-item routerLink="/patient/{{this.patientData['id']}}/chart">Gráfico Histórico</button>
-                        <button mat-menu-item>Busca por intervalo de indices</button>
+                        <button mat-menu-item routerLink="/patient/{{this.patientData['id']}}/indices_interval">Busca por intervalo de índice</button>
                         <!-- <button mat-menu-item>Ambos</button> -->
                     </mat-menu>
                 </div>
@@ -39,7 +39,7 @@
             <mat-divider class="shrinked"></mat-divider>
             <mat-card-content id="cardIndices">
                 <div *ngIf="data_to_show['indice_cardiaco']??'' != ''">
-                    <h4>Indice Cardíaco</h4>
+                    <h4>Índice Cardíaco</h4>
                     <p>{{data_to_show["indice_cardiaco"]}}</p>
                     <br>
                     <h4>Data da medição</h4>
@@ -47,7 +47,7 @@
                 </div>
                 <mat-divider vertical="true" *ngIf="data_to_show['indice_cardiaco']??'' != '' && data_to_show['indice_pulmonar']??'' != ''"></mat-divider>
                 <div *ngIf="data_to_show['indice_pulmonar']??'' != ''">
-                    <h4>Indice Pulmonar</h4>
+                    <h4>Índice Pulmonar</h4>
                     <p>{{data_to_show["indice_pulmonar"]}}</p>
                     <br>
                     <h4>Data da medição</h4>

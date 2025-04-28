@@ -5,6 +5,7 @@ import { PatientComponent } from './pages/patient/patient.component';
 import { IndicesComponent } from './pages/indices/indices.component';
 import { ExportToCSVComponent } from './components/export-to-csv/export-to-csv.component';
 import { ChartComponent } from './pages/chart/chart.component';
+import { IndicesByValueIntervalComponent } from './pages/indices-by-value-interval/indices-by-value-interval.component';
 
 const routeConfig: Routes = [
     {
@@ -41,6 +42,11 @@ const routeConfig: Routes = [
         path: 'patient/:id/chart',
         component: ChartComponent,
         title: 'Histórico',
+    },
+    {
+        path: 'patient/:id/indices_interval',
+        component: IndicesByValueIntervalComponent,
+        title: 'Busca por intervalo de indices',
     },
     {
         path: '**',

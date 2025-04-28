@@ -13,7 +13,7 @@
                 <mat-date-range-picker #picker></mat-date-range-picker>
             </mat-form-field>
             <button mat-raised-button onsubmit="this.handleSubmit()">Buscar!</button>
-            <button *ngIf="this.got_data" mat-raised-button (click)="this.handleExport()">Exportar tudo</button>
+            <button *ngIf="this.got_data && this.datesIndices.length>0" mat-raised-button (click)="this.handleExport()">Exportar tudo</button>
         </form>
     </section>
 
@@ -39,7 +39,7 @@
                                 <td mat-cell *matCellDef="let element"> {{element.datetime}} </td>
                             </ng-container>
                             <ng-container matColumnDef="indice_cardiaco">
-                                <th mat-header-cell *matHeaderCellDef>Indice cardíaco</th>
+                                <th mat-header-cell *matHeaderCellDef>Índice cardíaco</th>
                                 <td mat-cell *matCellDef="let element"> {{element.indice_cardiaco}} </td>
                             </ng-container>
                             <tr mat-header-row *matHeaderRowDef="displayedColumnsCardiaco"></tr>
@@ -57,7 +57,7 @@
                                 <td mat-cell *matCellDef="let element"> {{element.datetime}} </td>
                             </ng-container>
                             <ng-container matColumnDef="indice_pulmonar">
-                                <th mat-header-cell *matHeaderCellDef>Indice cardíaco</th>
+                                <th mat-header-cell *matHeaderCellDef>Índice cardíaco</th>
                                 <td mat-cell *matCellDef="let element"> {{element.indice_pulmonar}} </td>
                             </ng-container>
                             <tr mat-header-row *matHeaderRowDef="displayedColumnsPulmonar"></tr>

@@ -1,1 +1,48 @@
-<p>indices-by-value-interval works!</p>
+<main>
+
+    <section id="formSection">
+        <h1 routerLink="/patient/{{this.id}}" id="pageTitle">{{this.patient["nome"]}}</h1>
+        <h2>Pegar índice por intervalo</h2>
+        <form id="indicesForm" [formGroup]="indicesForm" (ngSubmit)="handleSubmit()">
+            <mat-radio-group id="radioSelect" formControlName="tipo" aria-label="Select an option"
+                (ngModelChange)="handleChangeMethod()">
+                <mat-label>Tipo de índice:</mat-label>
+                <mat-radio-button value="cardiaco">Índice Cardiaco</mat-radio-button>
+                <mat-radio-button value="pulmonar">Índice Pulmonar</mat-radio-button>
+            </mat-radio-group>
+            <mat-radio-group id="radioSelect" formControlName="historic_last" aria-label="Select an option"
+                (ngModelChange)="handleChangeMethod()">
+                <mat-label>Data do índice:</mat-label>
+                <mat-radio-button value="LIMIT 1">Apenas o último</mat-radio-button>
+                <mat-radio-button value="">Historicamente</mat-radio-button>
+            </mat-radio-group>
+            <div>
+                <mat-form-field>
+                    <mat-label >{{indice_min_label}}</mat-label>
+                    <input matInput id="min_indice" placeholder="0.00000" formControlName="min_indice">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>{{indice_max_label}}</mat-label>
+                    <input matInput id="max_indice" placeholder="1.00000" formControlName="max_indice">
+                </mat-form-field>
+            </div>
+            <button mat-raised-button onsubmit="this.handleSubmit()">Buscar!</button>
+            <button *ngIf="this.patientData.length>0" mat-raised-button (click)="this.handleExport()">Exportar tudo</button>
+        </form>
+    </section>
+    <section id="resultsSection">
+        <table mat-table [dataSource]="this.patientData" class="mat-elevation-z8">
+            <ng-container matColumnDef="datetime">
+                <th mat-header-cell *matHeaderCellDef>Data e hora</th>
+                <td mat-cell *matCellDef="let element"> {{element.datetime}} </td>
+            </ng-container>
+            <ng-container matColumnDef="{{this.indice_type == 'cardíaco' ? 'indice_cardiaco' : 'indice_pulmonar'}}">
+                <th mat-header-cell *matHeaderCellDef>Índice {{this.indice_type == "cardíaco" ? "Cardíaco": "Pulmonar"}}</th>
+                <td mat-cell *matCellDef="let element"> {{this.indice_type == "cardíaco" ? element.indice_cardiaco: element.indice_pulmonar}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="this.columns_to_display"></tr>
+            <tr mat-row *matRowDef="let row; columns: this.columns_to_display;"></tr>
+        </table>
+    </section>
+
+</main>

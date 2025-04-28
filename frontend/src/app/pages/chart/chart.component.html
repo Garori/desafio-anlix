@@ -2,8 +2,8 @@
 <main>
     
     <section id="formSection">
-        <h1 id="pageTitle">{{this.patient["nome"]}}</h1>
-        <h2>Pegar todos os indices por data</h2>
+        <h1 routerLink="/patient/{{this.id}}" id="pageTitle">{{this.patient["nome"]}}</h1>
+        <h2>Pegar todos os índices por data</h2>
         <form id="indicesForm" [formGroup]="indicesForm" (ngSubmit)="handleSubmit()">
             <mat-form-field>
                 <mat-label>Entre um espaço de tempo</mat-label>
@@ -21,7 +21,7 @@
     </section>
     <section id="chartSection" >
         <p  *ngIf="this.patientData.length > 0 && this.got_data">É possível dar zoom no grafico clicando nele com o mouse onde quer que comece o intervalo e arrastando até o fim do intervalo pretendido.
-        <br>Também é possível ativar ou desativar um dos indices clicando na legenda dele.
+        <br>Também é possível ativar ou desativar um dos índices clicando na legenda dele.
         <br>Para exportar o gráfico como imagem basta clicar no formato favorito no menu a direia em cima dele.
         <br>Depois de darzoom no gráfico é possível exportar o csv só das datas aparecendo no gráfico usando o botão de "exportarCSV" no menu do gráfico</p>
         <div id="chartDiv">

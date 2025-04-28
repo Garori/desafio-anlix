@@ -81,5 +81,15 @@ export class IntegrationAPIService {
     body["type"] = "both"
     return this.http.post(`${this.baseURL}/patient/${id}/dates`, body, { headers: headers })
   }
+
+  getPatientIndicesBetween(id: string, body: { [key: string]: any }): Observable<any> {
+    let headers = new HttpHeaders({
+      "Access-Control-Allow-Origin": "*",
+      'Access-Control-Allow-Headers': '*',
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+    })
+    return this.http.post(`${this.baseURL}/patient/${id}/indices_between`, body, { headers: headers })
+  }
   
 }

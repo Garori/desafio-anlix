@@ -5,7 +5,7 @@ import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 import { IntegrationAPIService } from '../../integration-api.service';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import moment, { min } from 'moment';
+import moment from 'moment';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ExportService } from '../../export.service';
@@ -165,7 +165,7 @@ export class ChartComponent {
     animationEnabled: true,
     theme: "light2",
     title: {
-      text: "Indice(s) x Data"
+      text: "Índice(s) x Data"
     },
     axisX: {
       valueFormatString: "DD/MM/YY"
@@ -193,7 +193,7 @@ export class ChartComponent {
       type: "line",
       markerType: "circle",
       showInLegend: true,
-      name: "Indice Cardiaco",
+      name: "Índice Cardiaco",
       xValueType: "dateTime",
       xValueFormatString: "DD/MMM/YY HH:MM",
       dataPoints: this.patientData[0]["data"]["cardiaco"],
@@ -201,7 +201,7 @@ export class ChartComponent {
       type: "line",
       markerType: "circle",
       showInLegend: true,
-      name: "Indice Pulmonar",
+      name: "Índice Pulmonar",
       xValueType: "dateTime",
       xValueFormatString: "DD/MMM/YY HH:MM",
       dataPoints: this.patientData[0]["data"]["pulmonar"],
