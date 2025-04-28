@@ -183,15 +183,16 @@ def getPatientIndiceByDates(id):
     return jsonify(final_res)
 
 # Consultar o valor mais recente de uma característica de um paciente que esteja entre um intervalo de valores a ser especificado na chamada da API;
-@app.route('/api/patient/indice_between', methods=['POST'])
-def getPatientIndiceBetween():
+@app.route('/api/patient/<id>/indices_between', methods=['POST'])
+def getPatientIndiceBetween(id):
     form = request.get_json()
     cur = mysql.connection.cursor()
     table = "indice_cardiaco_table" if form["tipo"] == "cardiaco" else "indice_pulmonar_table"
     indice = table.replace("_table", "")
     cur.execute(
-        f'''SELECT TOP 1 * FROM {table} WHERE cpf = "{form["cpf"]}" AND ({indice} BETWEEN {form["indice_min"]} AND {form["indice_max"]})
-        ORDER BY datetime DESC''')
+        f'''SELECT * FROM {table} WHERE id = "{id}" AND ({indice} BETWEEN {form["min_indice"]} AND {form["max_indice"]}) 
+        ORDER BY datetime DESC
+        {form["historic_last"]}''')
     data = cur.fetchall()
     columns = [x[0] for x in cur.description]
     res = []
