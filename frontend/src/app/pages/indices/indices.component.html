@@ -13,7 +13,7 @@
                 <mat-date-range-picker #picker></mat-date-range-picker>
             </mat-form-field>
             <button mat-raised-button onsubmit="this.handleSubmit()">Buscar!</button>
-            <button *ngIf="this.datesIndices != []" mat-raised-button (click)="this.handleExport()">Exportar tudo</button>
+            <button *ngIf="this.got_data" mat-raised-button (click)="this.handleExport()">Exportar tudo</button>
         </form>
     </section>
 

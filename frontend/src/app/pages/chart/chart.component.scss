@@ -1,0 +1,55 @@
+#indicesForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 20vh;
+    justify-content: flex-start;
+
+    >button {
+        margin-bottom: 1vh;
+        ;
+    }
+}
+
+#formSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#pageTitle {
+    font-size: 3em;
+}
+
+mat-form-field {
+    width: 50%;
+}
+
+mat-card-title {
+    cursor: pointer;
+}
+
+#chartSection{
+    margin-bottom: 5vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#chartDiv {
+    width: 100%;
+}
+
+#csvButton:hover{
+    background-color: rgb(33, 150, 243)
+}
+
+#noDataDiv{
+    
+    > p {
+        font-size: 2em;
+    }
+}

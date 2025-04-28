@@ -142,7 +142,8 @@ def getPatientIndiceByDates(id):
     cur = mysql.connection.cursor()
     if form["type"] in ["cardiaco", "both"]:
         cur.execute(f"""
-            SELECT * FROM indice_cardiaco_table WHERE id = "{id}" AND (datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59')""")
+            SELECT *, UNIX_TIMESTAMP(datetime)*1000 AS x, indice_cardiaco AS y FROM indice_cardiaco_table WHERE id = "{id}" AND (datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59')
+            ORDER BY datetime ASC""")
         cardiaco = cur.fetchall()
         columns = [x[0] for x in cur.description]
         columns = columns[1:]
@@ -150,17 +151,18 @@ def getPatientIndiceByDates(id):
             if result[0] in res.keys():
                 res[result[0]]["cardiaco"].append(
                     dict(zip(columns, result[1:])))
-                res[result[0]]["cardiaco"][-1]["datetime"] = res[result[0]]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+                # res[result[0]]["cardiaco"][-1]["datetime"] = res[result[0]]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
             else:
                 res[result[0]] = {"cardiaco": [], "pulmonar": []}
                 res[result[0]]["cardiaco"].append(
                     dict(zip(columns, result[1:])))
-                res[result[0]]["cardiaco"][-1]["datetime"] = res[result[0]]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+            res[result[0]]["cardiaco"][-1]["datetime"] = res[result[0]]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
 
 
     if form["type"] in ["pulmonar", "both"]:
         cur.execute(f"""
-            SELECT * FROM indice_pulmonar_table WHERE cpf = "{form["cpf"]}" AND (datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59')""")
+            SELECT *, UNIX_TIMESTAMP(datetime)*1000 AS x, indice_pulmonar AS y FROM indice_pulmonar_table WHERE id = "{id}" AND (datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59')
+            ORDER BY datetime ASC""")
         pulmonar = cur.fetchall()
         columns = [x[0] for x in cur.description]
         columns = columns[1:]
@@ -168,15 +170,15 @@ def getPatientIndiceByDates(id):
             if result[0] in res.keys():
                 res[result[0]]["pulmonar"].append(
                     dict(zip(columns, result[1:])))
-                res[result[0]]["pulmonar"][-1]["datetime"] = res[result[0]]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+                # res[result[0]]["pulmonar"][-1]["datetime"] = res[result[0]]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
             else:
                 res[result[0]] = {"cardiaco": [], "pulmonar": []}
                 res[result[0]]["pulmonar"].append(
                     dict(zip(columns, result[1:])))
-                res[result[0]]["pulmonar"][-1]["datetime"] = res[result[0]]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+            res[result[0]]["pulmonar"][-1]["datetime"] = res[result[0]]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
     final_res = []
-    for cpf in res.keys():
-        final_res.append({"cpf": cpf, "data": res[cpf]})
+    for id in res.keys():
+        final_res.append({"id": id, "data": res[id]})
     cur.close()
     return jsonify(final_res)
 

@@ -50,8 +50,10 @@ export class IndicesComponent {
   displayedColumnsCardiaco: string[] = ['datetime', 'indice_cardiaco'];
   displayedColumnsPulmonar: string[] = ['datetime', 'indice_pulmonar'];
 
-  data_str = ""
-  data_final_str = ""
+  data_str = "";
+  data_final_str = "";
+
+  got_data= false;
 
   
   indicesForm = new FormGroup({
@@ -91,6 +93,7 @@ export class IndicesComponent {
     let body = { "date": this.data_str, "final_date": this.data_final_str }
     this.integrationAPIService.getDatesIndices(body).subscribe(res => {
       this.datesIndices = res;
+      this.got_data = true;
       // console.log(res)
     });
   }

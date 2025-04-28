@@ -1,0 +1,35 @@
+
+<main>
+    
+    <section id="formSection">
+        <h1 id="pageTitle">{{this.patient["nome"]}}</h1>
+        <h2>Pegar todos os indices por data</h2>
+        <form id="indicesForm" [formGroup]="indicesForm" (ngSubmit)="handleSubmit()">
+            <mat-form-field>
+                <mat-label>Entre um espaço de tempo</mat-label>
+                <mat-date-range-input [rangePicker]="picker">
+                    <input matStartDate type="date" placeholder="Data Inicial" formControlName="data">
+                    <input matEndDate type="date" placeholder="Data Final" formControlName="data_final">
+                </mat-date-range-input>
+                <!-- <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint> -->
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+            </mat-form-field>
+            <button mat-raised-button onsubmit="this.handleSubmit()">Buscar!</button>
+            <button *ngIf="this.got_data && this.patientData.length > 0" mat-raised-button (click)="this.handleExport()">Exportar tudo</button>
+        </form>
+    </section>
+    <section id="chartSection" >
+        <p  *ngIf="this.patientData.length > 0 && this.got_data">É possível dar zoom no grafico clicando nele com o mouse onde quer que comece o intervalo e arrastando até o fim do intervalo pretendido.
+        <br>Também é possível ativar ou desativar um dos indices clicando na legenda dele.
+        <br>Para exportar o gráfico como imagem basta clicar no formato favorito no menu a direia em cima dele.
+        <br>Depois de darzoom no gráfico é possível exportar o csv só das datas aparecendo no gráfico usando o botão de "exportarCSV" no menu do gráfico</p>
+        <div id="chartDiv">
+            <canvasjs-chart  style="display: none;" id="chartchart" (chartInstance)="this.getChartInstance($event)" [options]="chartOptions" [styles]="{width: '100%', height:'50vh'}"></canvasjs-chart>
+        </div>
+        <div id="noDataDiv" *ngIf="this.patientData.length == 0 && this.got_data">
+            <p>Sem dados para mostrar para o intervalo escolhido</p>
+        </div>
+    </section>
+
+</main>

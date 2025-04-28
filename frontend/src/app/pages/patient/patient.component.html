@@ -28,11 +28,11 @@
                     </mat-menu>
                 </div>
                 <div>
-                    <button mat-raised-button [matMenuTriggerFor]="menuIndices">Histórico</button>
-                    <mat-menu #menuIndices="matMenu">
-                        <button mat-menu-item>Cardíaco</button>
-                        <button mat-menu-item>Pulmonar</button>
-                        <button mat-menu-item>Ambos</button>
+                    <button mat-raised-button [matMenuTriggerFor]="menuHistorico" >Histórico</button>
+                    <mat-menu #menuHistorico="matMenu">
+                        <button mat-menu-item routerLink="/patient/{{this.patientData['id']}}/chart">Gráfico Histórico</button>
+                        <button mat-menu-item>Busca por intervalo de indices</button>
+                        <!-- <button mat-menu-item>Ambos</button> -->
                     </mat-menu>
                 </div>
                 </mat-card-actions>
