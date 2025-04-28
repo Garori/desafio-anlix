@@ -24,7 +24,7 @@ With some more time I would take my time finishing all the basic requirements an
 * Making routes to insert new lines into the DB, as new patients and new "indices pulmonares/cardíacos"
 * Making improvements to some pages like creating a filter for the page with all the patients, their "indices" between two dates.
 * Pagination made on the backend instead of on the front end so the querys wont return datas so big.
-* Make the pages good to vizualize in smartphone mode with some responsibility changes/additions on the css and html parts (like @media on css, 'hamburguer menu' + sidenav on html...)
+* Make the pages good to vizualize in smartphone mode with some responsiveness changes/additions on the css and html parts (like @media on css, 'hamburguer menu' + sidenav on html...)
 * And unit testing that, I must admit, I still have to study much more.
 
 Another thing that I should state here: I'm not the graphics design guy, I know my way making a page exactly like I (or someone else) want it to look but I don't have the talent to imagine a pretty website by myself.
