@@ -92,7 +92,7 @@ def getDatesBothIndices():
         JOIN pacientes 
         ON pacientes.id=indice_cardiaco_table.id
         WHERE indice_cardiaco_table.datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59'
-        ORDER BY indice_cardiaco_table.datetime ASC
+        ORDER BY pacientes.nome, indice_cardiaco_table.datetime ASC
         """)
     cardiaco = cur.fetchall()
     columns_cardiaco = [x[0] for x in cur.description]
@@ -102,7 +102,7 @@ def getDatesBothIndices():
         FROM indice_pulmonar_table 
         INNER JOIN pacientes ON pacientes.id=indice_pulmonar_table.id
         WHERE indice_pulmonar_table.datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59'
-        ORDER BY indice_pulmonar_table.datetime ASC
+        ORDER BY pacientes.nome, indice_pulmonar_table.datetime ASC
         """)
     pulmonar = cur.fetchall()
     columns_pulmonar = [x[0] for x in cur.description]

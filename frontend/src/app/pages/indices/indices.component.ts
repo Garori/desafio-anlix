@@ -16,6 +16,7 @@ import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { ExportToCSVComponent } from '../../components/export-to-csv/export-to-csv.component';
 import { ExportService } from '../../export.service';
+import { PageEvent, MatPaginatorModule } from '@angular/material/paginator';
 
 const moment = _rollupMoment || _moment;
 
@@ -33,7 +34,7 @@ export const MY_FORMATS = {
 
 @Component({
   selector: 'app-indices',
-  imports: [ExportToCSVComponent, CommonModule, ReactiveFormsModule, MatDatepickerModule, MatFormFieldModule, MatButtonModule, MatCardModule, RouterModule, MatDividerModule, MatExpansionModule, MatTableModule],
+  imports: [MatPaginatorModule, ExportToCSVComponent, CommonModule, ReactiveFormsModule, MatDatepickerModule, MatFormFieldModule, MatButtonModule, MatCardModule, RouterModule, MatDividerModule, MatExpansionModule, MatTableModule],
   providers: [
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }
@@ -46,6 +47,7 @@ export class IndicesComponent {
   constructor(private integrationAPIService: IntegrationAPIService, private exportService: ExportService) {
   }
   datesIndices: any[] = [];
+  pageDatesIndices: any[] = [];
 
   displayedColumnsCardiaco: string[] = ['datetime', 'indice_cardiaco'];
   displayedColumnsPulmonar: string[] = ['datetime', 'indice_pulmonar'];
@@ -54,6 +56,9 @@ export class IndicesComponent {
   data_final_str = "";
 
   got_data= false;
+
+  paginatorLength = 0
+  pageEvent: PageEvent = new PageEvent;
 
   
   indicesForm = new FormGroup({
@@ -93,7 +98,23 @@ export class IndicesComponent {
     this.integrationAPIService.getDatesIndices(body).subscribe(res => {
       this.datesIndices = res;
       this.got_data = true;
+      this.pageDatesIndices = this.datesIndices.slice(0,10)
+      this.paginatorLength = res.length
       // console.log(res)
     });
+  }
+  
+  handlePageEvent(e: PageEvent) {
+    this.pageEvent = e;
+    console.log(e.pageIndex)
+
+    try {
+      this.pageDatesIndices = this.datesIndices.slice(e.pageSize * e.pageIndex, (e.pageSize * (e.pageIndex+1)))    
+    } catch (error) {
+      this.pageDatesIndices = this.datesIndices.slice(e.pageSize * e.pageIndex) 
+    }
+    // this.paginatorLength = e.length;
+    // this.pageSize = e.pageSize;
+    // this.pageIndex = e.pageIndex;
   }
 }

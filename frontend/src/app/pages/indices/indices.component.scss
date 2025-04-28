@@ -54,9 +54,17 @@
     font-size: 3em;
 }
 
-mat-form-field {
-    width: 50%;
-}
+// mat-form-field {
+//     width: 50%;
+// }
 mat-card-title{
     cursor: pointer;
+}
+
+#resultsSection{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
