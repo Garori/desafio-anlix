@@ -1,10 +1,13 @@
 USE desafio_anlix
 CREATE TABLE indice_pulmonar_table (
-id BIGINT,
+id BIGINT AUTO_INCREMENT,
+pacientes_id BIGINT,
 cpf VARCHAR(14) NOT NULL,
 epoch BIGINT NOT NULL,
 indice_pulmonar DOUBLE NOT NULL,
-datetime DATETIME
+datetime DATETIME,
+PRIMARY KEY (id),
+INDEX (pacientes_id)
 );
 INSERT INTO indice_pulmonar_table (cpf, epoch, indice_pulmonar)
 VALUES
@@ -6008,8 +6011,17 @@ VALUES
 ('974.340.772-39',1617115030,0.378161),
 ('777.421.360-07',1617084505,0.238110),
 ('272.846.051-54',1617078362,0.422527);
+
 UPDATE indice_pulmonar_table SET datetime = FROM_UNIXTIME(epoch);
-UPDATE indice_pulmonar_table ipt, pacientes pct SET ipt.id = pct.id WHERE ipt.cpf = pct.cpf;ALTER TABLE indice_pulmonar_table
+
+UPDATE indice_pulmonar_table ipt, pacientes pct SET ipt.pacientes_id = pct.id
+WHERE ipt.cpf = pct.cpf;
+
+ALTER TABLE indice_pulmonar_table
+ADD CONSTRAINT fk_pacientes_id_pulmonar FOREIGN KEY (pacientes_id) REFERENCES pacientes(id) ON DELETE CASCADE;
+
+ALTER TABLE indice_pulmonar_table
 DROP COLUMN epoch;
+
 ALTER TABLE indice_pulmonar_table
 DROP COLUMN cpf;

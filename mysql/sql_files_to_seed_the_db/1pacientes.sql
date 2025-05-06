@@ -1,7 +1,7 @@
 SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
 USE desafio_anlix
 CREATE TABLE pacientes (
-  id BIGINT AUTO_INCREMENT,
+  id BIGINT AUTO_INCREMENT NOT NULL UNIQUE,
   nome VARCHAR(255),
   idade BIGINT,
   cpf VARCHAR(14) NOT NULL UNIQUE,

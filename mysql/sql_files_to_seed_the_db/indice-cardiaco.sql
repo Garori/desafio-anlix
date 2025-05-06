@@ -1,10 +1,13 @@
 USE desafio_anlix
 CREATE TABLE indice_cardiaco_table (
-id BIGINT,
+id BIGINT AUTO_INCREMENT,
+pacientes_id BIGINT,
 cpf VARCHAR(14) NOT NULL,
 epoch BIGINT NOT NULL,
 indice_cardiaco DOUBLE NOT NULL,
-datetime DATETIME
+datetime DATETIME,
+PRIMARY KEY (id),
+INDEX (pacientes_id)
 );
 INSERT INTO indice_cardiaco_table (cpf, epoch, indice_cardiaco)
 VALUES
@@ -6008,8 +6011,17 @@ VALUES
 ('974.340.772-39',1617104661,0.320474),
 ('974.642.524-20',1617116137,0.335950),
 ('285.773.707-63',1617155043,0.201683);
+
 UPDATE indice_cardiaco_table SET datetime = FROM_UNIXTIME(epoch);
-UPDATE indice_cardiaco_table ict, pacientes pct SET ict.id = pct.id WHERE ict.cpf = pct.cpf;ALTER TABLE indice_cardiaco_table
+
+UPDATE indice_cardiaco_table ict, pacientes pct SET ict.pacientes_id = pct.id
+WHERE ict.cpf = pct.cpf;
+
+ALTER TABLE indice_cardiaco_table
+ADD CONSTRAINT fk_pacientes_id_cardiaco FOREIGN KEY (pacientes_id) REFERENCES pacientes(id) ON DELETE CASCADE;
+
+ALTER TABLE indice_cardiaco_table
 DROP COLUMN epoch;
+
 ALTER TABLE indice_cardiaco_table
 DROP COLUMN cpf;

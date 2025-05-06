@@ -1,8 +1,14 @@
 from flask import Flask, jsonify, request
-from flask_mysqldb import MySQL
+from flask_sqlalchemy import SQLAlchemy
+from decimal import Decimal
 import os
+from typing import List
+from sqlalchemy import func, between
+from sqlalchemy.orm import aliased, relationship, Mapped, Bundle
+from urllib.parse import unquote_plus
+
+# from sqlalchemy import create_engine
 app = Flask(__name__)
-mysql = MySQL(app)
 
 
 app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
@@ -11,71 +17,154 @@ app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
 app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
 
 # app.config["MYSQL_USER"] = "root"
-# app.config["MYSQL_DB"] = "anlix"
-# app.config["MYSQL_PASSWORD"] = ""
+# app.config["MYSQL_DB"] = "desafio_anlix"
+# app.config["MYSQL_PASSWORD"] = "123321"
 # app.config["MYSQL_HOST"] = "localhost"
 
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{app.config["MYSQL_USER"]}:{app.config["MYSQL_PASSWORD"]}@{app.config["MYSQL_HOST"]}/{app.config["MYSQL_DB"]}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+mysql:SQLAlchemy = SQLAlchemy(app)
+
+with app.app_context():
+    mysql.reflect()
+
+class Base_Table():
+    def __class_getitem__(self, key):
+        return getattr(self, key)
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
+class Pacientes(mysql.Model, Base_Table):
+    __table__ = mysql.Model.metadata.tables['pacientes']
+    _type = "pacientes"
+    IndicesCardiacos: Mapped[List["IndiceCardiaco"]] = relationship()
+    IndicesPulmonares: Mapped[List["IndicePulmonar"]] = relationship()
+
+
+class IndiceCardiaco(mysql.Model, Base_Table):
+    __table__ = mysql.Model.metadata.tables['indice_cardiaco_table']
+    _type = "cardiaco"
+
+class IndicePulmonar(mysql.Model, Base_Table):
+    __table__ = mysql.Model.metadata.tables['indice_pulmonar_table']
+    _type = "pulmonar"
+
+session = mysql.session
+
+def create_treated_res_fields(fields,items,not_in = []):
+    to_return = {}
+    for k in fields:
+        if k not in not_in:
+            item = items[k]
+            to_return[k] = float(item) if isinstance(item, Decimal) else item
+    return to_return
+
+
+def create_treated_res_class(res:Base_Table, not_in = []):
+    to_return = {}
+    res = res.to_dict()
+    for k in res.keys():
+        print(k)
+        if k not in not_in:
+            item = res[k]
+            to_return[k] = float(item) if isinstance(item, Decimal) else item
+    return to_return
 
 # mysql = MySQL()
 
 # Consultar, para cada paciente, cada uma das características individualmente e cada uma delas sendo a mais recente disponível;
 @app.route('/api/patient/<id>/indice_cardiaco_last', methods=['GET'])
 def getPatientLastIndiceCardiaco(id):
-    # form = request.get_json()
-    cur = mysql.connection.cursor()
-    cur.execute(
-        f'''SELECT indice_cardiaco, datetime FROM indice_cardiaco_table WHERE datetime = (select max(datetime) from indice_cardiaco_table WHERE id = "{id}")''')
-    data = cur.fetchall()
-    columns = [x[0] for x in cur.description]
-    res = []
-    for i,result in enumerate(data):
-        res.append(dict(zip(columns, result)))
-        res[i]["datetime_cardiaco"] = res[i]["datetime"].strftime("%d/%m/%Y %H:%M")
-        res[i].pop("datetime")
-    cur.close()
-    return jsonify(res)
+    res = session.scalars(
+        mysql.select(
+            IndiceCardiaco
+            ).where(
+                IndiceCardiaco.datetime == (
+                    mysql.select(
+                        func.max(
+                            IndiceCardiaco.datetime
+                            )
+                        ).where(
+                            IndiceCardiaco.pacientes_id == id
+                            )
+                    )
+                )
+        ).one_or_none()
+    treated_res = []
+    treated_res = [create_treated_res_class(res, ["id", "pacientes_id"])]
+    treated_res[0]["datetime_cardiaco"] = treated_res[0]["datetime"].strftime("%d/%m/%Y %H:%M")
+    treated_res[0].pop("datetime")
+    return jsonify(treated_res)
 
 
 #Consultar, para cada paciente, cada uma das características individualmente e cada uma delas sendo a mais recente disponível;
 @app.route('/api/patient/<id>/indice_pulmonar_last', methods=['GET'])
 def getPatientLastIndicePulmonar(id):
-    # form = request.get_json()
-    cur = mysql.connection.cursor()
-    cur.execute(
-        f'''SELECT indice_pulmonar,datetime FROM indice_pulmonar_table WHERE datetime = (select max(datetime) from indice_pulmonar_table WHERE id = "{id}")''')
-    data = cur.fetchall()
-    columns = [x[0] for x in cur.description]
-    res = []
-    for i, result in enumerate(data):
-        res.append(dict(zip(columns, result)))
-        res[i]["datetime_pulmonar"] = res[i]["datetime"].strftime("%d/%m/%Y %H:%M")
-        res[i].pop("datetime")
-    cur.close()
-    return jsonify(res)
+    res = session.scalars(
+        mysql.select(
+            IndicePulmonar
+        ).where(
+            IndicePulmonar.datetime == (
+                mysql.select(
+                    func.max(
+                        IndicePulmonar.datetime
+                    )
+                ).where(
+                    IndicePulmonar.pacientes_id == id
+                )
+            )
+        )
+    ).one_or_none()
+    treated_res = []
+    treated_res = [create_treated_res_class(res, ["id", "pacientes_id"])]
+    treated_res[0]["datetime_pulmonar"] = treated_res[0]["datetime"].strftime("%d/%m/%Y %H:%M")
+    treated_res[0].pop("datetime")
+    return jsonify(treated_res)
 
 
 #Consultar em uma única chamada, todas as características de um paciente, com os valores mais recentes de cada uma
 @app.route('/api/patient/<id>/both_indices_last', methods=['GET'])
 def getPatientLastIndices(id):
-    # form = request.get_json()
-    cur = mysql.connection.cursor()
-    cur.execute(f""" WITH
-        cardiaco AS (SELECT indice_cardiaco, datetime FROM indice_cardiaco_table WHERE datetime = (select max(datetime) from indice_cardiaco_table WHERE id = "{id}")),
-        pulmonar AS (SELECT indice_pulmonar, datetime FROM indice_pulmonar_table WHERE datetime = (select max(datetime) from indice_pulmonar_table WHERE id = "{id}"))
-        SELECT * FROM cardiaco,pulmonar
-        """)
-    data = cur.fetchall()
-    columns = [x[0] for x in cur.description]
-    #preciso diferenciar as colunas de datetime
-    columns[1] += "_cardiaco"
-    columns[3] += "_pulmonar"
-    res = []
-    for i, result in enumerate(data):
-        res.append(dict(zip(columns, result)))
-        res[i]["datetime_cardiaco"] = res[i]["datetime_cardiaco"].strftime("%d/%m/%Y %H:%M")
-        res[i]["datetime_pulmonar"] = res[i]["datetime_pulmonar"].strftime("%d/%m/%Y %H:%M")
-    cur.close()
-    return jsonify(res)
+    
+    cardiaco_subq = mysql.select(
+        IndiceCardiaco.datetime,
+        IndiceCardiaco.indice_cardiaco
+        ).where(IndiceCardiaco.datetime == (
+            mysql.select(func.max(IndiceCardiaco.datetime))
+            .where(IndiceCardiaco.pacientes_id == id).scalar_subquery()
+        ))
+    
+
+    pulmonar_subq = mysql.select(
+        IndicePulmonar.datetime,
+        IndicePulmonar.indice_pulmonar
+        ).where(IndicePulmonar.datetime == (
+            mysql.select(func.max(IndicePulmonar.datetime))
+            .where(IndicePulmonar.pacientes_id == id).scalar_subquery()
+        ))
+    
+
+    cardiaco = session.execute(cardiaco_subq).one_or_none()
+    pulmonar = session.execute(pulmonar_subq).one_or_none()
+    total = {"cardiaco":cardiaco, "pulmonar":pulmonar}
+    print(total)
+    treated_res = {}
+    # print(res)
+    for tipo in total.keys():
+        keys = total[tipo]._fields
+        items = total[tipo]._asdict()
+        for key in keys:
+            if key == "datetime":
+                # print(r[key])
+                treated_res[f"datetime_{tipo}"] = items[key].strftime("%d/%m/%Y %H:%M")
+            else:
+                treated_res[key] = float(items[key]) if isinstance(items[key], Decimal) else items[key]
+
+    treated_res = [treated_res]
+    return jsonify(treated_res)
 
 # Consultar para uma determinada data (dia, mês e ano), todas as características existentes de todos os pacientes da base de dados;
 @app.route('/api/dates/both_indices', methods=['POST'])
@@ -85,169 +174,227 @@ def getDatesBothIndices():
     form = request.get_json()
     if "final_date" not in form.keys():
         form["final_date"] = form["date"]
-    cur = mysql.connection.cursor()
-    cur.execute(f"""
-        SELECT pacientes.id, pacientes.nome, pacientes.cpf, indice_cardiaco_table.indice_cardiaco, indice_cardiaco_table.datetime
-        FROM indice_cardiaco_table 
-        JOIN pacientes 
-        ON pacientes.id=indice_cardiaco_table.id
-        WHERE indice_cardiaco_table.datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59'
-        ORDER BY pacientes.nome, indice_cardiaco_table.datetime ASC
-        """)
-    cardiaco = cur.fetchall()
-    columns_cardiaco = [x[0] for x in cur.description]
-    columns_cardiaco = columns_cardiaco[2:]
-    cur.execute(f"""
-        SELECT pacientes.id, pacientes.nome, pacientes.cpf, indice_pulmonar_table.indice_pulmonar, indice_pulmonar_table.datetime 
-        FROM indice_pulmonar_table 
-        INNER JOIN pacientes ON pacientes.id=indice_pulmonar_table.id
-        WHERE indice_pulmonar_table.datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59'
-        ORDER BY pacientes.nome, indice_pulmonar_table.datetime ASC
-        """)
-    pulmonar = cur.fetchall()
-    columns_pulmonar = [x[0] for x in cur.description]
-    columns_pulmonar = columns_pulmonar[2:]
-    print(columns_cardiaco)
-    res = {}
-    for result in cardiaco:
-        if str(result[0]) in res.keys():
-            res[str(result[0])]["cardiaco"].append(dict(zip(columns_cardiaco, result[2:])))
-            res[str(result[0])]["cardiaco"][-1]["datetime"] = res[str(result[0])]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
-        else:
-            res[str(result[0])] = {"cpf":result[2],"nome":result[1],"cardiaco":[],"pulmonar":[]}
-            res[str(result[0])]["cardiaco"].append(dict(zip(columns_cardiaco, result[2:])))
-            res[str(result[0])]["cardiaco"][-1]["datetime"] = res[str(result[0])]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
-    for result in pulmonar:
-        if str(result[0]) in res.keys():
-            res[str(result[0])]["pulmonar"].append(dict(zip(columns_pulmonar, result[2:])))
-            res[str(result[0])]["pulmonar"][-1]["datetime"] = res[str(result[0])]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
-        else:
-            res[str(result[0])] = {"cpf":result[2],"nome":result[1],"cardiaco":[],"pulmonar":[]}
-            res[str(result[0])]["pulmonar"].append(dict(zip(columns_pulmonar, result[2:])))
-            res[str(result[0])]["pulmonar"][-1]["datetime"] = res[str(result[0])]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
-    final_res = []
-    for id in res.keys():
-        final_res.append({"id":str(id),"data":res[str(id)]})
-    cur.close()
-    return jsonify(final_res)
+    # cur = mysql.connection.cursor()
+    cardiaco = mysql.select(
+        Pacientes.nome, Pacientes.id, Pacientes.cpf,
+        IndiceCardiaco.indice_cardiaco, IndiceCardiaco.datetime
+    ).join_from(
+        Pacientes, Pacientes.IndicesCardiacos
+    ).where(
+        between(IndiceCardiaco.datetime, f"{form["date"]} 00:00:00",f"{form["final_date"]} 23:59:59")
+    ).order_by(Pacientes.nome).order_by(IndiceCardiaco.datetime)
+    print(cardiaco)
+    pulmonar = mysql.select(
+        Pacientes.nome, Pacientes.id, Pacientes.cpf,
+        IndicePulmonar.indice_pulmonar, IndicePulmonar.datetime
+    ).join_from(
+        Pacientes, Pacientes.IndicesPulmonares
+    ).where(
+        between(IndicePulmonar.datetime, f"{form["date"]} 00:00:00", f"{form["final_date"]} 23:59:59")
+    ).order_by(Pacientes.nome).order_by(IndicePulmonar.datetime)
+
+    res_cardiaco = session.execute(cardiaco).all()
+    res_pulmonar = session.execute(pulmonar).all()
+    treated_res = {}
+    # print(res_cardiaco)
+    for r in res_cardiaco:
+        keys = r._fields
+        break
+    for r in res_cardiaco:
+        items = r._asdict()
+        if r.id not in treated_res.keys():
+            treated_res[r.id] = {"id":r.id,"data":{"nome":r.nome, "cpf":r.cpf,"pulmonar":[],"cardiaco":[]}}
+        treated_res[r.id]["data"]["cardiaco"].append(create_treated_res_fields(keys,items,["id", "nome", "cpf"]))
+        treated_res[r.id]["data"]["cardiaco"][-1]["datetime"] = treated_res[r.id]["data"]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+    for r in res_pulmonar:
+        keys = r._fields
+        break
+    for r in res_pulmonar:
+        items = r._asdict()
+        if r.id not in treated_res.keys():
+            treated_res[r.id] = {"id":r.id,"data":{"nome":r.nome, "cpf":r.cpf,"pulmonar":[],"cardiaco":[]}}
+        treated_res[r.id]["data"]["pulmonar"].append(create_treated_res_fields(keys,items,["id", "nome", "cpf"]))
+        treated_res[r.id]["data"]["pulmonar"][-1]["datetime"] = treated_res[r.id]["data"]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+    
+    treated_res = [treated_res[paciente_id] for paciente_id in treated_res.keys()]
+    return jsonify(treated_res)
 
 
-#EXTRA Rota que consulta algum indice, ou ambos, de um dado paciente dentro de um intervalo de dias
+
+#ROTA para o gráfico
 @app.route('/api/patient/<id>/dates', methods=['POST'])
 def getPatientIndiceByDates(id):
     form = request.get_json()
     if "final_date" not in form.keys():
         form["final_date"] = form["dates"]
-    res = {}
-    cur = mysql.connection.cursor()
+    treated_res = {}
+    # cur = mysql.connection.cursor()
     if form["type"] in ["cardiaco", "both"]:
-        cur.execute(f"""
-            SELECT *, UNIX_TIMESTAMP(datetime)*1000 AS x, indice_cardiaco AS y FROM indice_cardiaco_table WHERE id = "{id}" AND (datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59')
-            ORDER BY datetime ASC""")
-        cardiaco = cur.fetchall()
-        columns = [x[0] for x in cur.description]
-        columns = columns[1:]
-        for result in cardiaco:
-            if result[0] in res.keys():
-                res[result[0]]["cardiaco"].append(
-                    dict(zip(columns, result[1:])))
-                # res[result[0]]["cardiaco"][-1]["datetime"] = res[result[0]]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
-            else:
-                res[result[0]] = {"cardiaco": [], "pulmonar": []}
-                res[result[0]]["cardiaco"].append(
-                    dict(zip(columns, result[1:])))
-            res[result[0]]["cardiaco"][-1]["datetime"] = res[result[0]]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+
+        cardiaco = mysql.select(
+                IndiceCardiaco.indice_cardiaco,
+                IndiceCardiaco.pacientes_id,
+                IndiceCardiaco.datetime,
+                IndiceCardiaco.indice_cardiaco.label("y"),
+                (func.unix_timestamp(IndiceCardiaco.datetime)*1000).label("x")
+            ).where(
+                IndiceCardiaco.pacientes_id == id
+            ).where(
+                between(
+                    IndiceCardiaco.datetime, f"{form["date"]} 00:00:00", f"{form["final_date"]} 23:59:59"
+                )
+            ).order_by(
+                IndiceCardiaco.datetime
+            )
+        # print(cardiaco)
+        res_cardiaco = session.execute(cardiaco).all()
+        # print(res_cardiaco)
+        # print(len(res_cardiaco))
+        for r in res_cardiaco:
+            keys = r._fields
+            break
+        # print(keys)
+        for r in res_cardiaco:
+            # print("aa")
+            # print(r._asdict())
+            items = r._asdict()
+            # print(items)
+            if r.pacientes_id not in treated_res.keys():
+                treated_res[r.pacientes_id] = {"data": {"id": r.pacientes_id, "pulmonar": [], "cardiaco": []}}
+            treated_res[r.pacientes_id]["data"]["cardiaco"].append(create_treated_res_fields(keys, items, ["pacientes_id"]))
+            treated_res[r.pacientes_id]["data"]["cardiaco"][-1]["datetime"] = treated_res[r.pacientes_id]["data"]["cardiaco"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+    # print(treated_res)
 
 
     if form["type"] in ["pulmonar", "both"]:
-        cur.execute(f"""
-            SELECT *, UNIX_TIMESTAMP(datetime)*1000 AS x, indice_pulmonar AS y FROM indice_pulmonar_table WHERE id = "{id}" AND (datetime BETWEEN '{form["date"]} 00:00:00' AND '{form["final_date"]} 23:59:59')
-            ORDER BY datetime ASC""")
-        pulmonar = cur.fetchall()
-        columns = [x[0] for x in cur.description]
-        columns = columns[1:]
-        for result in pulmonar:
-            if result[0] in res.keys():
-                res[result[0]]["pulmonar"].append(
-                    dict(zip(columns, result[1:])))
-                # res[result[0]]["pulmonar"][-1]["datetime"] = res[result[0]]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
-            else:
-                res[result[0]] = {"cardiaco": [], "pulmonar": []}
-                res[result[0]]["pulmonar"].append(
-                    dict(zip(columns, result[1:])))
-            res[result[0]]["pulmonar"][-1]["datetime"] = res[result[0]]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
-    final_res = []
-    for id in res.keys():
-        final_res.append({"id": id, "data": res[id]})
-    cur.close()
-    return jsonify(final_res)
+        pulmonar = (
+            mysql.select(
+                IndicePulmonar.indice_pulmonar,
+                IndicePulmonar.pacientes_id,
+                IndicePulmonar.datetime,
+                IndicePulmonar.indice_pulmonar.label("y"),
+                (func.unix_timestamp(IndicePulmonar.datetime)*1000).label("x")
+            )
+            .where(
+                IndicePulmonar.pacientes_id == id
+            )
+            .where(
+                between(
+                    IndicePulmonar.datetime, f"{form["date"]} 00:00:00", f"{form["final_date"]} 23:59:59"
+                )
+            )
+            .order_by(
+                IndicePulmonar.datetime
+            )
+        )
+
+        res_pulmonar = session.execute(pulmonar).all()
+        for r in res_pulmonar:
+            keys = r._fields
+            break
+        for r in res_pulmonar:
+            items = r._asdict()
+            # print(items)
+            if r.pacientes_id not in treated_res.keys():
+                treated_res[r.pacientes_id] = {"data": {"id": r.pacientes_id, "pulmonar": [], "cardiaco": []}}
+            treated_res[r.pacientes_id]["data"]["pulmonar"].append(create_treated_res_fields(keys, items, ["pacientes_id"]))
+            treated_res[r.pacientes_id]["data"]["pulmonar"][-1]["datetime"] = treated_res[r.pacientes_id]["data"]["pulmonar"][-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+
+    treated_res = [treated_res[paciente_id] for paciente_id in treated_res.keys()]
+    return jsonify(treated_res)
+
 
 # Consultar o valor mais recente de uma característica de um paciente que esteja entre um intervalo de valores a ser especificado na chamada da API;
 @app.route('/api/patient/<id>/indices_between', methods=['POST'])
 def getPatientIndiceBetween(id):
+    # print(IndicePulmonar["indice_pulmonar"])
     form = request.get_json()
-    cur = mysql.connection.cursor()
-    table = "indice_cardiaco_table" if form["tipo"] == "cardiaco" else "indice_pulmonar_table"
-    indice = table.replace("_table", "")
-    cur.execute(
-        f'''SELECT * FROM {table} WHERE id = "{id}" AND ({indice} BETWEEN {form["min_indice"]} AND {form["max_indice"]}) 
-        ORDER BY datetime DESC
-        {form["historic_last"]}''')
-    data = cur.fetchall()
-    columns = [x[0] for x in cur.description]
-    res = []
-    for i, result in enumerate(data):
-        res.append(dict(zip(columns, result)))
-        res[i]["datetime"] = res[i]["datetime"].strftime("%d/%m/%Y %H:%M")
-    cur.close()
-    return jsonify(res)
+    table = IndiceCardiaco if form["tipo"] == "cardiaco" else IndicePulmonar
+    indice = "indice_cardiaco" if form["tipo"] == "cardiaco" else "indice_pulmonar"
+    query = mysql.select(
+        table
+    ).where(
+        table.pacientes_id == id
+    ).where(
+        between(
+            table[indice], form["min_indice"], form["max_indice"]
+        )
+    ).order_by(
+        table.datetime
+    )
+    treated_res = []
+    if form["historic_last"] == "LIMIT 1":
+        res = session.scalars(
+            query
+        ).first()
+        print(res)
+        treated_res.append(create_treated_res_class(res, ["pacientes_id", "id"]))
+        treated_res[-1]["datetime"] = treated_res[-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+    else:
+        res = session.scalars(
+            query
+        ).all()
+        for r in res:
+            treated_res.append(create_treated_res_class(r,["pacientes_id","id"]))
+            treated_res[-1]["datetime"] = treated_res[-1]["datetime"].strftime("%d/%m/%Y %H:%M")
+    return jsonify(treated_res)
 
 
 #Consultar pacientes que contenham um nome ou parte de um nome a ser especificado na chamada da API.
 # +email e cpf
 @app.route('/api/patient/<method>/<search>', methods=['GET'])
 def getPatient(method,search):
-    # form = request.get_json()
-    cur = mysql.connection.cursor()
     if method in ["nome", "email"]:
-        cur.execute(
-            f'''SELECT
-            id,nome,idade,cpf,rg,data_nasc,email,sexo,mae,pai,cep,endereco,numero,bairro,cidade,estado,telefone_fixo,celular,altura,peso,tipo_sanguineo,cor,signo
-            FROM pacientes WHERE {method} LIKE "%{search}%" ORDER BY {method}''')
+        res = session.execute(
+            mysql.select(
+                *(Pacientes[c] for c in Pacientes.__table__.columns.keys() if c not in ["senha"])
+            ).where(
+                Pacientes[method].ilike(f"%{unquote_plus(search)}%")
+            ).order_by(
+                Pacientes[method]
+            )
+        ).all()
     elif method == "cpf":
-        cur.execute(
-        f'''SELECT
-            id,nome,idade,cpf,rg,data_nasc,email,sexo,mae,pai,cep,endereco,numero,bairro,cidade,estado,telefone_fixo,celular,altura,peso,tipo_sanguineo,cor,signo
-            FROM pacientes WHERE {method} = "{search}"''')
+        res = session.execute(
+            mysql.select(
+                *(Pacientes[c] for c in Pacientes.__table__.columns.keys() if c not in ["senha"])
+            ).where(
+                Pacientes[method] == search
+            )
+        ).one_or_none()
+        treated_res = []
+        keys = res._fields
+        items = res._asdict()
+        treated_res.append(create_treated_res_fields(keys, items))
+        return jsonify(treated_res)
     else:
         return jsonify([])
     
-    data = cur.fetchall()
-    columns = [x[0] for x in cur.description]
-    res = []
-    for result in data:
-        res.append(dict(zip(columns, result)))
-    cur.close()
-    return jsonify(res)
+    treated_res = []
+    keys = res[0]._fields
+    for r in res:
+        items = r._asdict()
+        treated_res.append(create_treated_res_fields(keys,items))
+    return jsonify(treated_res)
 
 
 @app.route('/api/patient/<id>', methods=['GET'])
 def getPatientById(id):
     # form = request.get_json()
-    cur = mysql.connection.cursor()
-    # if method in ["nome", "email"]:
-    cur.execute(
-        f'''SELECT
-        id,nome,idade,cpf,rg,data_nasc,email,sexo,mae,pai,cep,endereco,numero,bairro,cidade,estado,telefone_fixo,celular,altura,peso,tipo_sanguineo,cor,signo
-        FROM pacientes WHERE id = {id}''')
 
-    data = cur.fetchall()
-    columns = [x[0] for x in cur.description]
-    res = []
-    for result in data:
-        res.append(dict(zip(columns, result)))
-    cur.close()
-    return jsonify(res)
+    res = session.execute(
+        mysql.select(
+            *(Pacientes[c] for c in Pacientes.__table__.columns.keys() if c not in ["senha"])
+        ).where(
+            Pacientes.id == id
+        )
+    ).one_or_none()
+
+    treated_res = []
+    keys = res._fields
+    items = res._asdict()
+    treated_res.append(create_treated_res_fields(keys, items))
+    return jsonify(treated_res)
 
 
 
