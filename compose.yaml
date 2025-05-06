@@ -18,12 +18,12 @@ services:
       - backnet
     ports:
     - '3306:3306'
-    # restart: always
-    # healthcheck:
-    #   test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="123321" --silent']
-    #   interval: 3s
-    #   retries: 5
-    #   start_period: 30s
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 3s
+      retries: 5
+      start_period: 30s
     expose:
       - 3306
       - 33060
@@ -35,8 +35,6 @@ services:
       - "4200:4200"
     expose:
       - 4200
-    depends_on:
-      - backend
     networks:
       - frontnet
     volumes:
@@ -58,8 +56,9 @@ services:
       - MYSQL_DB=desafio_anlix
       # - DEVELOP=1
     depends_on:
-      - mysql
-    #     condition: service_healthy
+      mysql:
+        condition: service_healthy
+        restart: true
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
@@ -68,7 +67,9 @@ services:
     
   phpmyadmin:
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+        restart: true
     image: phpmyadmin
     restart: always
     ports:
