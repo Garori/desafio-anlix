@@ -15,18 +15,18 @@
     flex-wrap: wrap;
     > mat-card {
         margin: 2.5%;
-        min-width: 20%;
-        max-width: 95%;
+        width: 20%;
         min-height: 15vh;
-        cursor: pointer;
         filter: drop-shadow(1px 1px 1px #00000033);
-        > mat-card-header {
-            > .mat-mdc-card-header-text {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-start;
-                    max-width: 100%;
-                }
+        * {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        > mat-card-header.mat-mdc-card-header {
+            cursor: pointer;
+            display: block;
+            
         }
 
         > mat-divider {
@@ -62,4 +62,32 @@
 
 mat-form-field {
     width: 50%;
+}
+
+@media all and (max-width: 1366px) {
+    #resultsDiv {
+        >mat-card {
+            margin: 1.5%;
+            width: 30.333%;
+            min-height: 15vh;
+        }
+    }
+}
+@media all and (max-width: 800px) {
+    #resultsDiv {
+        >mat-card {
+            margin: 2.0%;
+            width: 45%;
+            min-height: 15vh;
+        }
+    }
+}
+@media all and (max-width: 600px) {
+    #resultsDiv {
+        >mat-card {
+            margin: 2.5%;
+            width: 95%;
+            min-height: 15vh;
+        }
+    }
 }

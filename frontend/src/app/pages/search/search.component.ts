@@ -23,16 +23,55 @@ export class SearchComponent {
 
   placeholderForInput = "Nome"
   patientsFromSearchResults = [
-  //   {
-  //   "nome": "Cabriel Gonde",
-  //   "cpf": "[Redacted]",
-  //   "id":1
-  // },
-  // {"nome":"Canilo Dolares",
-  //   "cpf":"seila",
-  //   "id":2
-  // }
-]
+    // {
+    //   "nome": "Cabriel Gonde",
+    //   "cpf": "[Redacted]",
+    //   "id":1,
+    //   "mae": "donamae",
+    //   "pai": "seu pai",
+    //   "email": "lindtonio@gmail.com"
+    // },
+    // {
+    //   "nome":"Canilo Dolares",
+    //   "cpf":"seila",
+    //   "id":2,
+    //   "mae": "donamae",
+    //   "pai": "seu pai",
+    //   "email": "lindinhaflorzinha123456deoliveiradocinhoeseuutonio@gmail.com"
+    // },
+    // {
+    //   "nome": "Cabriel Gonde",
+    //   "cpf": "[Redacted]",
+    //   "id": 1,
+    //   "mae": "donamae",
+    //   "pai": "seu pai",
+    //   "email": "lindinhaflorzinha123456deoliveiradocinhoeseuutonio@gmail.com"
+    // },
+    // {
+    //   "nome": "Canilo Dolares",
+    //   "cpf": "seila",
+    //   "id": 2,
+    //   "mae": "donamae",
+    //   "pai": "seu pai",
+    //   "email": "lindinhaflorzinha123456deoliveiradocinhoeseuutonio@gmail.com"
+    // },
+    // {
+    //   "nome": "Cabriel Gonde",
+    //   "cpf": "[Redacted]",
+    //   "id": 1,
+    //   "mae": "donamae",
+    //   "pai": "seu pai",
+    //   "email": "lindinhaflorzinha123ssssss456deoliveiradocinhoeseuutonio@gmail.com"
+    // },
+    // {
+    //   "nome": "Canilo Dolssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssares",
+    //   "cpf": "seila",
+    //   "id": 2,
+    //   "mae": "donamae",
+    //   "pai": "seu pai",
+    //   "email": "lindinhaflorzinha123456deolissssssssssveiradocinhoeseuutonio@gmail.com"
+    // }
+  ]
 
   searchForm = new FormGroup({
     search: new FormControl('', [Validators.required, Validators.minLength(5)]),
@@ -61,6 +100,9 @@ export class SearchComponent {
           });
           // console.log()
       
+    }
+    else {
+      this.patientsFromSearchResults = []
     }
     
   }
